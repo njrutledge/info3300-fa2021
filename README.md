@@ -1,6 +1,8 @@
 # Assignment 2
 Welcome to Assignment 2! In this assignment, we'll be implementing some of the most fundamental (and common) functionality of graphical software. By the time you are done, you will never look at Powerpoint the same way again...
 
+The assignment will have a small 1-week check-in due by **11:59 on September 28** and the final submission due a week later, by **11:59 on October 5**.
+
 Before you read this, make sure to go over [the AniGraph README.md](src/anigraph/README.md) to get some background on how the MVC pattern works in AniGraph applications.
 
 ### Setup
