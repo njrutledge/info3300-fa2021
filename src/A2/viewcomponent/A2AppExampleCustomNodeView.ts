@@ -1,11 +1,10 @@
 import {A2DLinesElement, A2DSceneNodeView, ABasic2DElement, APolygonElement} from "../../anigraph";
-import {A2AppSceneNodeModel} from "../mvc";
-import {A2AppExampleCustomNodeController} from "./A2AppExampleCustomNodeController";
+import {A2AppSceneNodeController, A2AppSceneNodeModel} from "../mvc";
 import {getSubdividedVerts} from "./BasicSubdivision";
 
 
 export class A2AppExampleCustomNodeView extends A2DSceneNodeView<A2AppSceneNodeModel>{
-    controller!:A2AppExampleCustomNodeController;
+    controller!:A2AppSceneNodeController;
     public fillElement!:ABasic2DElement;
     public strokeElement!:A2DLinesElement;
 

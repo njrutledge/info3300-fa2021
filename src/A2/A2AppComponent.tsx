@@ -5,8 +5,9 @@ import {A2AppGlobalState} from "./A2AppGlobalState";
 import {NewAMVCNodeClassSpec} from "../anigraph";
 import {A2AppSceneNodeView} from "./mvc/scenenode/A2AppSceneNodeView";
 import {A2AppExampleCustomNodeView} from "./viewcomponent/A2AppExampleCustomNodeView";
-import {A2AppExampleCustomNodeController} from "./viewcomponent/A2AppExampleCustomNodeController";
 import "./A2App.css"
+import {FancyController, FancyModel, FancyView} from "./viewcomponent";
+import {EyeController, EyeModel, EyeView} from "./viewcomponent/custom/eyes";
 
 const appState = A2AppGlobalState.SetAppState();
 
@@ -24,13 +25,21 @@ export enum A2AppSubComponents{
 const A2AppModelSceneComponent = appState.AppComponent(
     A2AppSceneController,
     A2AppSubComponents.ModelScene,
-    NewAMVCNodeClassSpec(A2AppSceneNodeModel, A2AppSceneNodeView, A2AppSceneNodeController)
+    [
+        NewAMVCNodeClassSpec(A2AppSceneNodeModel, A2AppSceneNodeView, A2AppSceneNodeController),
+        NewAMVCNodeClassSpec(FancyModel, A2AppSceneNodeView, A2AppSceneNodeController),
+        NewAMVCNodeClassSpec(EyeModel, EyeView, EyeController)
+        // NewAMVCNodeClassSpec(EyeModel, A2AppSceneNodeView, A2AppSceneNodeController)
+    ]
 );
 
 const A2AppViewSceneComponent = appState.AppComponent(
     A2AppSceneController,
     A2AppSubComponents.ViewScene,
-    NewAMVCNodeClassSpec(A2AppSceneNodeModel, A2AppExampleCustomNodeView, A2AppExampleCustomNodeController)
+    [NewAMVCNodeClassSpec(A2AppSceneNodeModel, A2AppExampleCustomNodeView, A2AppSceneNodeController),
+        NewAMVCNodeClassSpec(FancyModel, FancyView, FancyController),
+        NewAMVCNodeClassSpec(EyeModel, EyeView, EyeController)
+    ]
 );
 
 

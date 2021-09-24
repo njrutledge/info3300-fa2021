@@ -1,5 +1,7 @@
-import {A2DSceneModel, ASerializable} from "src/anigraph";
+import {A2DSceneModel, ASerializable, GetAppState} from "src/anigraph";
 import {A2AppSceneNodeModel} from "../scenenode";
+import {Base2DAppAppState, Base2DAppModel} from "../../../anigraph/apps/Base2DApp";
+import {A2AppGlobalState} from "../../A2AppGlobalState";
 
 @ASerializable("A2AppSceneModel")
 export abstract class A2AppSceneModel<NodeModelType extends A2AppSceneNodeModel> extends A2DSceneModel<NodeModelType>{
@@ -28,6 +30,7 @@ export abstract class A2AppSceneModel<NodeModelType extends A2AppSceneNodeModel>
 @ASerializable("A2AppSceneModelBasic")
 export class A2AppSceneModelBasic extends A2AppSceneModel<A2AppSceneNodeModel>{
     NewNode(){
-        return new A2AppSceneNodeModel();
+        // return new A2AppSceneNodeModel();
+        return new ((GetAppState() as unknown as A2AppGlobalState).currentNewModelType)();
     }
 }

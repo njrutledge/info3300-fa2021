@@ -2,8 +2,8 @@ import {
     A2DSceneModel,
     A2DSceneNodeModel,
     AModel,
-    ASceneController,
-    ClassInterface,
+    ASceneController, ASerializable,
+    ClassInterface, GetAppState, GetASerializableClassByName,
     SceneControllerID,
     SceneControllerIDs,
 } from "src/anigraph";
@@ -25,9 +25,30 @@ enum CreateModes{
 export abstract class Basic2DAppState<NodeModelType extends A2DSceneNodeModel, SceneModelType extends A2DSceneModel<NodeModelType>> extends A2DAppState<NodeModelType, SceneModelType> {
     @AObjectState creatingNew!: boolean;
     @AObjectState selectedColor!: Color;
-    @AObjectState _isCreatingShape:boolean;
+    @AObjectState _isCreatingShape!:boolean;
+    @AObjectState _currentNewModelTypeName!:string;
     static SceneControllerIDs = SceneControllerIDs;
 
+    /** Get set currentNewModelTypeName */
+    set currentNewModelTypeName(value:string){this._currentNewModelTypeName = value;}
+    // @ts-ignore
+    get currentNewModelTypeName():string{
+        if (this._currentNewModelTypeName) {
+            return this._currentNewModelTypeName;
+        } else {
+            for (let k in this.sceneControllers) {
+                for (let m in this.sceneControllers[k].ModelClassMap) {
+                    return this.sceneControllers[k].ModelClassMap[m].modelClass.SerializationLabel();
+                    // return k.ModelClassMap
+                }
+            }
+        }
+    }
+
+    get currentNewModelType(){
+        // @ts-ignore
+        return GetASerializableClassByName(this.currentNewModelTypeName);
+    }
 
     get selectedModels(){
         return this.selectionModel.selectedModels as NodeModelType[];
@@ -42,23 +63,29 @@ export abstract class Basic2DAppState<NodeModelType extends A2DSceneNodeModel, S
 
     getControlPanelStandardSpec(): {} {
         const self = this;
-        return {
-            color: {
-                value: this.selectedColor.toHexString(),
-                onChange: (v: string) => {
-                    let selectedColor = Color.FromString(v);
-                    if (self.selectionModel.nSelectedModels==1) {
-                        // appState.selectionModel.updateColor();
-                        for(let m of self.modelSelection){
-                            // @ts-ignore
-                            m.color = selectedColor;
-                        }
+        let spec_controller = self._getSpecSceneController();
+        let modelTypeSelection = {};
+        if(spec_controller){
+            modelTypeSelection=spec_controller.getModelTypeChoiceControlSpec();
+        }
 
-                    }
-                    // @ts-ignore
-                    self.selectedColor = selectedColor;
-                },
-            },
+        return {
+            // color: {
+            //     value: this.selectedColor.toHexString(),
+            //     onChange: (v: string) => {
+            //         let selectedColor = Color.FromString(v);
+            //         if (self.selectionModel.nSelectedModels==1) {
+            //             // appState.selectionModel.updateColor();
+            //             for(let m of self.modelSelection){
+            //                 // @ts-ignore
+            //                 m.color = selectedColor;
+            //             }
+            //
+            //         }
+            //         // @ts-ignore
+            //         self.selectedColor = selectedColor;
+            //     },
+            // },
             // createMode: {
             //     value: 0,
             //     options: {
@@ -69,10 +96,23 @@ export abstract class Basic2DAppState<NodeModelType extends A2DSceneNodeModel, S
             //         console.log("create mode ")
             //     }
             // },
+            // creatingNew: {
+            //     value: self._isCreatingShape,
+            //     onChange: (v: boolean) => {
+            //         self.setIsCreatingShape(v);
+            //     }
+            // }
             creatingNew: {
                 value: self._isCreatingShape,
                 onChange: (v: boolean) => {
                     self.setIsCreatingShape(v);
+                }
+            },
+            NewModelType: {
+                value: self.currentNewModelTypeName,
+                options: modelTypeSelection,
+                onChange:(v:string)=>{
+                    self.currentNewModelTypeName=v;
                 }
             }
         };
@@ -144,7 +184,9 @@ export abstract class Basic2DAppState<NodeModelType extends A2DSceneNodeModel, S
 class Base2DAppSceneModel extends A2DSceneModel<Base2DAppModel>{
     // protected _DefaultNodeClass = Base2DAppModel;
     NewNode(): Base2DAppModel {
-        return new Base2DAppModel();
+        // return new Base2DAppModel();
+        return new ((GetAppState() as unknown as Base2DAppAppState).currentNewModelType)();
+
     }
 }
 

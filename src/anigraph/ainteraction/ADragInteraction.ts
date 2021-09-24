@@ -165,6 +165,19 @@ export class ADragInteractionBase extends AInteraction{
 }
 
 export class ADragInteraction extends ADragInteractionBase{
+    /**
+     * Adds a drag interaction to a specified threejs object with the given callbacks.
+     * Most of the time you probably want to leave out the handle argument, unless you know what you are doing
+     * and it's for debugging.
+     *
+     * @param element - a THREE.Object3D, (or Mesh, or any other object that inherits THREE.Object3D)
+     * @param dragStartCallback
+     * @param dragMoveCallback
+     * @param dragEndCallback
+     * @param handle
+     * @returns {ADragInteraction}
+     * @constructor
+     */
     static Create(element:any,
                   dragStartCallback:ADragInteractionCallback,
                   dragMoveCallback:ADragInteractionCallback,

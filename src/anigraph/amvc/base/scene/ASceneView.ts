@@ -5,6 +5,7 @@ import {Color} from "../../../amath";
 import {saveAs} from "file-saver";
 import {ASerializable} from "src/anigraph/aserial";
 import {ASceneModel, ASceneNodeModel} from "../index";
+import {GetAppState} from "../../AAppState";
 
 enum BackgroundOrder{
     Back="Back",
@@ -122,6 +123,7 @@ export abstract class ASceneView<NodeModelType extends ASceneNodeModel, SceneMod
     render(){
         // requestAnimationFrame(()=>this.render);
         requestAnimationFrame(()=>this.render());
+        GetAppState().onAnimationFrameCallback();
         this.renderer.render(this.threejs, this.camera);
         if(this._recordNextFrame === true){
             this._recordNextFrame = false;

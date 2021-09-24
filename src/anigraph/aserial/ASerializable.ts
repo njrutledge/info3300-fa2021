@@ -195,7 +195,9 @@ export function GetIndexedCopy(obj:any){
     return deepIndexedCopy(obj);
 }
 
-
+export function GetASerializableClassByName(className:string){
+    return ASerializableClassesDict[className];
+}
 
 
 

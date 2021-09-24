@@ -69,6 +69,15 @@ export abstract class ASceneController<NodeModelType extends ASceneNodeModel, Sc
 
     }
 
+
+    getModelTypeChoiceControlSpec(){
+        let rval:{[name:string]:string}= {};
+        for(let m in this.ModelClassMap){
+            rval[m]=this.ModelClassMap[m].modelClass.SerializationLabel();
+        }
+        return rval;
+    }
+
     get model():SceneModelType{
         return this._model;
     };

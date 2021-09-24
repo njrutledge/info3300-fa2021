@@ -17,6 +17,7 @@ export class A2AppGlobalState extends A2AppGlobalStateBase<A2AppSceneNodeModel, 
     getControlPanelStandardSpec(): {} {
         const self = this;
         return {
+            ...super.getControlPanelStandardSpec(),
             addDefaultScene: button(()=> {
                 self.sceneModel.addDefaultScene();
             }),
@@ -35,12 +36,6 @@ export class A2AppGlobalState extends A2AppGlobalStateBase<A2AppSceneNodeModel, 
                     // @ts-ignore
                     self.selectedColor = selectedColor;
                 },
-            },
-            creatingNew: {
-                value: self._isCreatingShape,
-                onChange: (v: boolean) => {
-                    self.setIsCreatingShape(v);
-                }
             }
         };
     }

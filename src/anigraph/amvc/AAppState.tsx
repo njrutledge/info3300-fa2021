@@ -8,6 +8,7 @@ import {ASelectionModel, SelectionEvents} from "./base/selection";
 import React, {useEffect, useRef} from "react";
 import {v4 as uuidv4} from 'uuid';
 import {ClassInterface} from "../basictypes";
+import {CallbackType} from "../aevents";
 
 export const SceneControllerIDs = {
     default:"default",
@@ -29,13 +30,26 @@ export function SetAppState(appState:AAppState<any, any>):AAppState<any, any>{
 }
 
 
-
 @ASerializable("AAppState")
 export abstract class AAppState<NodeModelType extends ASceneNodeModel, SceneModelType extends ASceneModel<NodeModelType>> extends AObject{
     // @AObjectState modelControlSpecs:{}
     @AObjectState _guiKey!:string;
     @AObjectState sceneModel!:SceneModelType;
     @AObjectState selectionModel!: ASelectionModel<NodeModelType>;
+    @AObjectState time:number;
+    protected _clockID!:number;
+    protected _paused!:boolean;
+
+    onAnimationFrameCallback(){
+        // let ah = setInterval()
+    }
+
+
+    protected _getSpecSceneController(){
+        for(let k in this.sceneControllers){
+            return this.sceneControllers[k];
+        }
+    }
 
     abstract NewSceneModel(...args:[]):SceneModelType;
 
@@ -124,6 +138,31 @@ export abstract class AAppState<NodeModelType extends ASceneNodeModel, SceneMode
         this._initCalled=true;
     }
 
+    pauseClock(){
+        if(!this._paused){
+            this._paused=true;
+            clearInterval(this._clockID);
+        }
+    }
+    unpauseClock(){
+        if(this._paused){
+            const self = this;
+            this._paused=false;
+            this._clockID = setInterval(()=>{
+                if(!self._paused) {
+                    self.time = Date.now();
+                }
+            });
+        }
+    }
+    toggleClockPause(){
+        if(this._paused){
+            this.unpauseClock();
+        }else{
+            this.pauseClock();
+        }
+    }
+
     /** Get set selectedModel */
     // set selectedModel(value:NodeModelType|undefined){this._selectedModel = value;}
     // get selectedModel(){return this._selectedModel;}
@@ -133,6 +172,10 @@ export abstract class AAppState<NodeModelType extends ASceneNodeModel, SceneMode
 
     constructor(sceneModel?:SceneModelType){
         super();
+        this._paused=true;
+        this.time = Date.now();
+        this.unpauseClock();
+
         if(sceneModel){
             this.sceneModel=sceneModel;
         }else{
@@ -143,6 +186,13 @@ export abstract class AAppState<NodeModelType extends ASceneNodeModel, SceneMode
             throw new Error(`Scene model ${sceneModel} already has appState: ${this.sceneModel.appState}`)
         }
         this.sceneModel.appState = this;
+    }
+
+    addClockListener(callback:(t:number)=>any){
+        const self = this;
+        return this.addStateKeyListener('time', ()=>{
+            callback(self.time);
+        });
     }
 
     triggerGUIUpdate(){
@@ -199,6 +249,7 @@ export abstract class AAppState<NodeModelType extends ASceneNodeModel, SceneMode
                 controllerName = name;
             }
             self.addSceneController(sceneController, controllerName);
+            self.triggerGUIUpdate();
         }
 
         return function ReturnAppComponent(props:any) {
