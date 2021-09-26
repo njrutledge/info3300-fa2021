@@ -7,12 +7,14 @@ export class EyeModel extends A2AppSceneNodeModel{
     @AObjectState targetRange:number;
     @AObjectState dilation:number;
     @AObjectState targetPoint:Vec2;
+    @AObjectState blinkDuration:number;
 
     constructor(){
         super();
         this.dilation = 0.5;
         this.targetRange=25;
         this.targetPoint = V2(0,0);
+        this.blinkDuration = 0.1;
     }
 
     getModelGUIControlSpec(){
@@ -31,6 +33,15 @@ export class EyeModel extends A2AppSceneNodeModel{
                 step:0.01,
                 onChange: (v: number) => {
                     self.dilation = v;
+                }
+            },
+            blinkDuration: {
+                value: self.blinkDuration,
+                min: 0,
+                max: 1,
+                step:0.01,
+                onChange: (v: number) => {
+                    self.blinkDuration = v;
                 }
             }
         }

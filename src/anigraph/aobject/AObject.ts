@@ -267,6 +267,7 @@ export class AObject{
         if(name in this._subscriptions){
             if(this._subscriptions[name].active){
                 this._subscriptions[name].deactivate();
+                console.warn(`Re-Subscribing to "${name}", which already has a subscription!`)
             }
         }
         this._subscriptions[name]=callbackSwitch;

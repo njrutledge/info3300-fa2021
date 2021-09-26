@@ -1,7 +1,7 @@
 import {A2AppSceneModel, A2AppSceneModelBasic, A2AppSceneNodeModel} from "./mvc";
 import {Basic2DAppState} from "../anigraph/apps/Base2DApp/Base2DAppAppState";
 import {Color, SetAppState} from "../anigraph";
-import {button} from "leva";
+import {button, folder} from "leva";
 
 export abstract class A2AppGlobalStateBase<NodeModelType extends A2AppSceneNodeModel, SceneModelType extends A2AppSceneModel<NodeModelType>> extends Basic2DAppState<NodeModelType, SceneModelType> {
     getModelControlSpecs(){

@@ -1,4 +1,11 @@
-import {A2DSelectionController, ADragInteraction, AInteractionEvent} from "src/anigraph";
+import {
+    A2DSelectionController,
+    ADragInteraction,
+    AInteractionEvent,
+    Mat3,
+    NodeTransform2D,
+    Precision, Vec2
+} from "src/anigraph";
 import {A2AppSceneNodeModel} from "../scenenode";
 import {A2AppSelectionView} from "./A2AppSelectionView";
 import {

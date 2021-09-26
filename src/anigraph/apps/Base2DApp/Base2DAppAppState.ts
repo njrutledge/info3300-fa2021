@@ -12,6 +12,7 @@ import {Base2DAppModel} from "./models";
 import {Color} from "../../amath";
 import {ASelection} from "../../aobject/ASelection";
 import {A2DAppState} from "../../amvc/A2DAppState";
+import {folder} from "leva";
 
 
 interface BasicNodeModelType extends AModel{
@@ -102,6 +103,22 @@ export abstract class Basic2DAppState<NodeModelType extends A2DSceneNodeModel, S
             //         self.setIsCreatingShape(v);
             //     }
             // }
+
+            selectionControls: folder(
+                {
+                    freezeSelection: {
+                        value: !!(self.selectionModel.isFrozen),
+                        onChange: (v: boolean) => {
+                            if(v){
+                                self.freezeSelection();
+                            }else{
+                                self.unfreezeSelection();
+                            }
+                        }
+                    }
+                },
+                { collapsed: true }
+            ),
             creatingNew: {
                 value: self._isCreatingShape,
                 onChange: (v: boolean) => {

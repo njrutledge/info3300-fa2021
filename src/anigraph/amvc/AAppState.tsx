@@ -195,6 +195,7 @@ export abstract class AAppState<NodeModelType extends ASceneNodeModel, SceneMode
         });
     }
 
+
     triggerGUIUpdate(){
         this._guiKey = uuidv4();
     }
