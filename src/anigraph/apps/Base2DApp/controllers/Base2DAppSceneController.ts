@@ -92,10 +92,10 @@ export class Base2DAppSceneController<NodeModelType extends Base2DAppModel, Scen
         },
             CreateShapeName);
 
-        this.GetInteractionMode(CreateShapeName).setBeforeActivateCallback(()=>{
+        this.getInteractionMode(CreateShapeName).setBeforeActivateCallback(()=>{
             self.view.setBackgroundOrder(ASceneView.BackgroundOrder.Front);
         });
-        this.GetInteractionMode(CreateShapeName).setAfterDeactivateCallback(()=>{
+        this.getInteractionMode(CreateShapeName).setAfterDeactivateCallback(()=>{
             self.view.setBackgroundOrder(ASceneView.BackgroundOrder.Back);
         });
         this.addInteraction(createShapeInteraction);

@@ -176,7 +176,7 @@ export abstract class Basic2DAppState<NodeModelType extends A2DSceneNodeModel, S
     setInteractionMode(modeName?:string){
         for(let k in this.sceneControllers){
             if(modeName) {
-                let imode = this.sceneControllers[k].GetInteractionMode(modeName);
+                let imode = this.sceneControllers[k].getInteractionMode(modeName);
                 if (imode) {
                     this.sceneControllers[k].setCurrentInteractionMode(modeName);
                 }

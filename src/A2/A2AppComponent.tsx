@@ -8,6 +8,8 @@ import {A2AppExampleCustomNodeView} from "./viewcomponent/A2AppExampleCustomNode
 import "./A2App.css"
 import {FancyController, FancyModel, FancyView} from "./viewcomponent";
 import {EyeController, EyeModel, EyeView} from "./viewcomponent/custom/eyes";
+import { EditVertsModel } from "./viewcomponent/custom/editverts/EditVertsModel";
+import {EditVertsController, EditVertsView} from "./viewcomponent/custom/editverts";
 
 const appState = A2AppGlobalState.SetAppState();
 
@@ -28,6 +30,7 @@ const A2AppModelSceneComponent = appState.AppComponent(
     [
         NewAMVCNodeClassSpec(A2AppSceneNodeModel, A2AppSceneNodeView, A2AppSceneNodeController),
         NewAMVCNodeClassSpec(FancyModel, A2AppSceneNodeView, A2AppSceneNodeController),
+        NewAMVCNodeClassSpec(EditVertsModel, EditVertsView, EditVertsController),
         NewAMVCNodeClassSpec(EyeModel, EyeView, EyeController)
         // NewAMVCNodeClassSpec(EyeModel, A2AppSceneNodeView, A2AppSceneNodeController)
     ]
@@ -38,6 +41,7 @@ const A2AppViewSceneComponent = appState.AppComponent(
     A2AppSubComponents.ViewScene,
     [NewAMVCNodeClassSpec(A2AppSceneNodeModel, A2AppExampleCustomNodeView, A2AppSceneNodeController),
         NewAMVCNodeClassSpec(FancyModel, FancyView, FancyController),
+        NewAMVCNodeClassSpec(EditVertsModel, EditVertsView, EditVertsController),
         NewAMVCNodeClassSpec(EyeModel, EyeView, EyeController)
     ]
 );

@@ -28,7 +28,7 @@ There are three basic types of models in our scene graph. The first represents a
 
 #### `src/A2/mvc/scene`
 - [A2AppSceneModel.ts](src/A2/mvc/scene/A2AppSceneModel.ts): Defines a model representing our scene. In a basic AniGraph application, the the main function of a scene model is simply to root our hierarchy of node models. However, in a game-like application, the scene model would be a good place to put game data and logic.
-- [A2AppSceneController.ts](src/A2/mvc/scene): Defines our scene controller, which is responsible for any interactions that don't belong to individual node models. For example, interactions with the background, like the one triggered by the "createNew" switch in A2 that lets a user click on the background to place the vertices of a new polygon.
+- [A2AppSceneController.ts](src/A2/mvc/scene): Defines our scene controller, which is responsible for any interactions that don't belong to individual node models. For example, interactions with the background, like the one triggered by the "creatingNew" switch in A2 that lets a user click on the background to place the vertices of a new polygon.
 - [A2AppSceneView/ts](src/A2/mvc/scene/A2AppSceneView.ts): Defines our scene view, which is mostly responsible for holding the [`THREE.Camera`](https://threejs.org/docs/#api/en/cameras/Camera) used to view a scene. In A2 this camera is a simple orthographic camera (we will learn what that means later) and you won't have to mess with it for the assignment. The scene view also holds a background element, which is a transparent element used to intercept user interactions with the background (e.g., deselecting objects or placing new vertices in the scene).
 
 #### `src/A2/mvc/node`

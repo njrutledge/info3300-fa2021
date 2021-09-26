@@ -21,6 +21,10 @@ export class AInteractionMode{
         this.owner = owner;
     }
 
+    /**
+     * adds interaction, and sets its owner to be this owner
+     * @param interaction
+     */
     addInteraction(interaction:AInteraction){
         // if(this.active){
         //     throw new Error("Cannot add interactions to an active interaction mode!");
@@ -32,6 +36,10 @@ export class AInteractionMode{
         if(!this.active && interaction.active){
             interaction.deactivate();
         }
+        if(interaction.owner){
+            throw new Error('interaction already has owner!');
+        }
+        interaction.owner = this.owner;
     }
 
     deactivate(){

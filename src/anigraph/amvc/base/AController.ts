@@ -98,7 +98,9 @@ export abstract class AController<ModelType extends AModel> extends AObject{
         return this._interactions.modes[this._currentInteractionModeName];
     }
 
-    GetInteractionMode(name:string){
+
+
+    getInteractionMode(name:string){
         return this._interactions.modes[name];
     }
 
@@ -108,7 +110,7 @@ export abstract class AController<ModelType extends AModel> extends AObject{
      */
     addInteraction(interaction:AInteraction){
         this.interactionMode.addInteraction(interaction);
-        interaction.owner = this;
+        // interaction.owner = this;
         return interaction;
     }
 
