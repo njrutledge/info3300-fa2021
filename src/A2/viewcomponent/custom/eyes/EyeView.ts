@@ -43,6 +43,9 @@ export class EyeView extends A2AppExampleCustomNodeView{
         super.initGraphics();
 
         // make default geometry invisible
+        // This geometry is created in src/A2/viewcomponentA2AppExampleCustomNodeView.ts
+        // If you want a (mostly) blank canvas, you should use these two lines,
+        // or, if you're feeling adventurous, subclass A2DSceneNodeView<A2AppSceneNodeModel> directly.
         this.fillElement.visible=false;
         this.strokeElement.visible=false;
 
@@ -50,6 +53,11 @@ export class EyeView extends A2AppExampleCustomNodeView{
         this.iris = new APolygonElement();
         this.pupil = new APolygonElement();
 
+        // This is where we initialize our eye with its geometry
+        // Our circles are really made of finite line segments around the circle traced by sin and cos.
+        // See the CircleVArray method above.
+        // APolygonElement and A2DLinesElement have different ways to initialize them.
+        // See the code in APolygonElement.ts and A2DLinesElement.ts in src/anigraph/arender/2d/ for details.
         this.outline.setVerts(CircleVArray(this.width, 100));
         this.outline.setColor(Color.FromString("#000"))
         this.outline.setLineWidth(0.01);
@@ -59,6 +67,10 @@ export class EyeView extends A2AppExampleCustomNodeView{
         Mat4.Scale2D([1,this.height/this.width]).assignTo(this.outline.threejs.matrix);
         Mat4.Scale2D([this.model.dilation,this.model.dilation]).assignTo(this.pupil.threejs.matrix);
 
+        // Now that we've created the objects, we need them all to be accessible from the root (this.threejs)
+        // We add them heirarchically so the pupil can inherit the transform from the iris
+        // Be mindful that this is using threejs directly, but there is also the addElement method.
+        // See the calls to this.addElement in src/A2/viewcomponentA2AppExampleCustomNodeView.ts for an example.
         this.eyeObject = NewObject3D();
         this.eyeObject.add(this.iris.threejs);
         this.iris.threejs.add(this.pupil.threejs);

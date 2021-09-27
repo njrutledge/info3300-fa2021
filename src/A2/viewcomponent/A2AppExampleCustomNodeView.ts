@@ -4,6 +4,7 @@ import {getSubdividedVerts} from "./BasicSubdivision";
 
 
 export class A2AppExampleCustomNodeView extends A2DSceneNodeView<A2AppSceneNodeModel>{
+    // This controller member is essential if you're subclassing A2DSceneNodeView
     controller!:A2AppSceneNodeController;
     public fillElement!:ABasic2DElement;
     public strokeElement!:A2DLinesElement;
