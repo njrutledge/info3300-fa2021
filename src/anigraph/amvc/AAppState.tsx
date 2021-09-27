@@ -225,7 +225,9 @@ export abstract class AAppState<NodeModelType extends ASceneNodeModel, SceneMode
     }
 
 
-    AppComponent(sceneControllerClass:ClassInterface<ASceneController<NodeModelType,SceneModelType>>, name?:string, classSpec?:AMVCNodeClassSpec<NodeModelType>|AMVCNodeClassSpec<NodeModelType>[]){
+    AppComponent(sceneControllerClass:ClassInterface<ASceneController<NodeModelType,SceneModelType>>,
+                 name?:string,
+                 classSpec?:AMVCNodeClassSpec<NodeModelType>|AMVCNodeClassSpec<NodeModelType>[]){
         const self = this;
         async function initThreeJSContext(container: HTMLDivElement) {
             let sceneController = new sceneControllerClass(container);

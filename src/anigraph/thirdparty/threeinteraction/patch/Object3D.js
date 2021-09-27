@@ -1,5 +1,4 @@
 import {Object3D} from 'three';
-import {Mat3} from "../../../amath";
 
 /**
  * whether displayObject is interactively

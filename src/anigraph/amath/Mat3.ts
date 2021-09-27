@@ -2,6 +2,7 @@ import {Matrix} from "./Matrix";
 import {Vector} from "./Vector";
 import {Vec3} from "./Vec3";
 import {Vec2} from "./Vec2";
+import {Mat4} from "./Mat4";
 import assert from "assert";
 import {Random} from "./Random";
 import {ASerializable} from "../aserial/ASerializable";
@@ -35,7 +36,7 @@ export class Mat3 extends Matrix{
     }
 
     /**
-     * For function `mxy()`, gets or sets the element of the matrix at the 
+     * For function `mxy()`, gets or sets the element of the matrix at the
      * position [x, y]
      */
     set m00(value){this.elements[0]=value;}
@@ -104,7 +105,7 @@ export class Mat3 extends Matrix{
 
     /**
      * Returns this matrix made up of the columns `c0`, `c1`, `c2`.
-     * 
+     *
      * @param c0 The first column
      * @param c1 The second column
      * @param c2 The third column
@@ -119,7 +120,7 @@ export class Mat3 extends Matrix{
     }
     /**
      * Returns this matrix made up of the rows `r0`, `r1`, `r2`.
-     * 
+     *
      * @param c0 The first row
      * @param c1 The second row
      * @param c2 The third row
@@ -138,7 +139,7 @@ export class Mat3 extends Matrix{
 
     /**
      * Returns a new identity matrix.
-     * 
+     *
      * @returns a new identity matrix
      */
     static Identity(){
@@ -146,16 +147,16 @@ export class Mat3 extends Matrix{
     }
 
     /**
-     * Returns the corresponding 3D scale transformation matrix given the scaling 
+     * Returns the corresponding 3D scale transformation matrix given the scaling
      * factor.
-     * 
-     * If factor is a number, then uses the factor for scaling in the x and y 
+     *
+     * If factor is a number, then uses the factor for scaling in the x and y
      * direction.
-     * If factor is an array of length three, then uses the factor[0] as the x 
+     * If factor is an array of length three, then uses the factor[0] as the x
      * direction, factor[1] as the y direction, and factor[2] as the z-direction.
-     * If factor is a `Vec3`, then uses the factor[0] as the x-direction, 
+     * If factor is a `Vec3`, then uses the factor[0] as the x-direction,
      * factor[1] as the y-direction, and factor[2] as the z-direction.
-     * 
+     *
      * @param factor the scaling factor
      */
     public static Scale3D(factor:number):Mat3;
@@ -196,14 +197,14 @@ export class Mat3 extends Matrix{
     /**
      * Returns the corresponding 2D scale transformation matrix for the given
      * scaling factor.
-     * 
-     * If `factor` is a `number`, then uses the factor for scaling in the x and 
+     *
+     * If `factor` is a `number`, then uses the factor for scaling in the x and
      * y directions.
-     * If `factor` is an `array` of length two, then uses the factor[0] as the x 
+     * If `factor` is an `array` of length two, then uses the factor[0] as the x
      * direction and factor[1] as the y-direction.
-     * If `factor` is a `Vec2`, then uses the factor[0] as the x-direction and 
+     * If `factor` is a `Vec2`, then uses the factor[0] as the x-direction and
      * factor[1] as the y-direction.
-     * 
+     *
      * @param factor the scaling factor
      */
     public static Scale2D(factors:Array<number>):Mat3;
@@ -239,14 +240,14 @@ export class Mat3 extends Matrix{
     /**
      * Returns the corresponding 2D translation transformation matrix for the
      * given translation `t` or `x` and `y`.
-     * 
+     *
      * If the argument is `x` and `y`, then it translates in the x-direction `x`
      * amount and in the y-direction `y` amount.
      * If `t` is an `array` of length two, then uses the t[0] as the x-direction
      * and t[1] as the y-direction.
      * If `t` is a `Vec2`, then uses the t[0] as the x-direction and t[1] as the
      * y-direction.
-     * 
+     *
      * @param t the translation factor
      */
     public static Translation2D(t:Array<number>):Mat3;
@@ -271,9 +272,9 @@ export class Mat3 extends Matrix{
     }
 
     /**
-     * Returns the corresponding rotation transformation matrix for the given 
+     * Returns the corresponding rotation transformation matrix for the given
      * `radians`.
-     * 
+     *
      * @param radians the rotation amount in radians
      * @returns the rotation transformation matrix
      */
@@ -290,7 +291,7 @@ export class Mat3 extends Matrix{
 
     /**
      * Returns a matrix with random floats for each element
-     * 
+     *
      * @returns a matrix with random elements
      */
     static Random(){
@@ -300,7 +301,7 @@ export class Mat3 extends Matrix{
 
     /**
      * Returns a matrix with all zeros
-     * 
+     *
      * @returns a matrix with all zeros
      */
     static Zeros(){
@@ -311,7 +312,7 @@ export class Mat3 extends Matrix{
 
     /**
      * Returns a matrix with all ones
-     * 
+     *
      * @returns a matrix with all ones
      */
     static Ones(){
@@ -366,7 +367,7 @@ export class Mat3 extends Matrix{
 
     /**
      * Returns the determinant for this matrix.
-     * 
+     *
      * @returns the determinant
      */
     determinant() {
