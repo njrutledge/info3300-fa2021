@@ -1,5 +1,5 @@
 import {ADragInteractionBase} from "./ADragInteraction";
-import {CallbackType} from "../aevents";
+import {CallbackType} from "../basictypes";
 import {AInteractionEvent} from "./AInteraction";
 
 

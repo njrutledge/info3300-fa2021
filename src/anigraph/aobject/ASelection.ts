@@ -4,6 +4,7 @@
  */
 import objectHash from "object-hash";
 import {ASerializable} from "../aserial";
+import {CallbackType} from "../basictypes";
 
 
 @ASerializable("ASelection")
@@ -55,6 +56,15 @@ export class ASelection<T>{
         this._exitCallback = exitCallback?exitCallback:(a:T)=>{return;}
     }
 
+
+    mapOverElements(func:(a:T)=>any){
+        let rval=[];
+        let items  = this.items();
+        for(let i of items){
+            rval.push(func(i));
+        }
+        return rval;
+    }
 
     /**
      * Returns the selection in simple list form.

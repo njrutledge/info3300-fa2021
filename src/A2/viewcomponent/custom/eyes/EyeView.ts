@@ -1,39 +1,34 @@
-import {A2AppSceneNodeView} from "../../../mvc/scenenode/A2AppSceneNodeView";
 import {A2AppExampleCustomNodeView} from "../../A2AppExampleCustomNodeView";
-import {A2AppExampleCustomNodeController} from "../../A2AppExampleCustomNodeController";
 import {
     A2DLinesElement,
-    ABasic2DElement,
-    APolygonElement, ASerializable, Color, GetAppState, Mat4,
-    NodeTransform2D,
+    APolygonElement, ARenderGroup, ASerializable, Color, GetAppState, Mat3, Mat4,
     V2,
     VertexArray2D
 } from "../../../../anigraph";
 import {EyeController} from "./EyeController";
-import {A2AppSceneNodeModel} from "../../../mvc";
 import {EyeModel} from "./EyeModel";
-import {NewObject3D} from "../../../../anigraph/arender/ThreeJSWrappers";
 
-function CircleVArray(size:number, nverts:number=25){
-    let verts=new VertexArray2D();
-    for(let v=0;v<nverts;v++){
-        let phase = v*(2*Math.PI)/nverts;
-        verts.addVertex(V2(Math.cos(phase)*size, Math.sin(phase)*size));
-    }
-    return verts;
-}
+
 
 
 @ASerializable("EyeView")
 export class EyeView extends A2AppExampleCustomNodeView{
     public controller!:EyeController;
+
+    // ---Elements---
+    // a group for the eye pieces
+    public eyeGroup!:ARenderGroup;
+
+    // parts
     public outline!:A2DLinesElement;
     public iris!:APolygonElement;
     public pupil!:APolygonElement;
+    // ------------
+
+
     public height=70;
     public width = 100
     public whitespace = 0.2;
-    public eyeObject!:THREE.Object3D;
 
     get model(){
         return this.controller.model as EyeModel;
@@ -49,33 +44,49 @@ export class EyeView extends A2AppExampleCustomNodeView{
         this.fillElement.visible=false;
         this.strokeElement.visible=false;
 
+        // this.outline will be the oval outline of the eye
         this.outline = new A2DLinesElement();
+        // this.iris will be the colored circle
         this.iris = new APolygonElement();
+        // this.pupil will be the dark pupil
         this.pupil = new APolygonElement();
 
-        // This is where we initialize our eye with its geometry
-        // Our circles are really made of finite line segments around the circle traced by sin and cos.
-        // See the CircleVArray method above.
-        // APolygonElement and A2DLinesElement have different ways to initialize them.
+        // let's define a subroutine that returns a vertex array with the vertices of a circle
+        // we will feed the size of the circle and the number of vertices to sample as arguments
+        function CircleVArray(size:number, nverts:number=25){
+            let verts=new VertexArray2D();
+            for(let v=0;v<nverts;v++){
+                let phase = v*(2*Math.PI)/nverts;
+                verts.addVertex(V2(Math.cos(phase)*size, Math.sin(phase)*size));
+            }
+            return verts;
+        }
+
+
+
+        // With CircleVArray in hand, let's initialize some geometry for our eye.
         // See the code in APolygonElement.ts and A2DLinesElement.ts in src/anigraph/arender/2d/ for details.
-        this.outline.setVerts(CircleVArray(this.width, 100));
-        this.outline.setColor(Color.FromString("#000"))
+
+        // First, we will initialize the outline, which is an A2DLinesElement:
+        this.outline.init(CircleVArray(this.width, 100), Color.FromString("#000"));
         this.outline.setLineWidth(0.01);
+
+        // Now let's initialize our iris and pupil
         this.iris.init(CircleVArray(this.height*(1-this.whitespace), 100), this.model.color)
         this.pupil.init(CircleVArray(this.height*(1-this.whitespace)), Color.FromString("#000"))
 
-        Mat4.Scale2D([1,this.height/this.width]).assignTo(this.outline.threejs.matrix);
-        Mat4.Scale2D([this.model.dilation,this.model.dilation]).assignTo(this.pupil.threejs.matrix);
+        this.outline.setTransform(Mat3.Scale2D([1,this.height/this.width]));
+        this.pupil.setTransform(Mat3.Scale2D([this.model.dilation,this.model.dilation]));
 
         // Now that we've created the objects, we need them all to be accessible from the root (this.threejs)
         // We add them heirarchically so the pupil can inherit the transform from the iris
         // Be mindful that this is using threejs directly, but there is also the addElement method.
         // See the calls to this.addElement in src/A2/viewcomponentA2AppExampleCustomNodeView.ts for an example.
-        this.eyeObject = NewObject3D();
-        this.eyeObject.add(this.iris.threejs);
-        this.iris.threejs.add(this.pupil.threejs);
-        this.eyeObject.add(this.outline.threejs);
-        this.threejs.add(this.eyeObject);
+        this.eyeGroup = new ARenderGroup
+        this.eyeGroup.add(this.iris);
+        this.iris.add(this.pupil);
+        this.eyeGroup.add(this.outline);
+        this.addElement(this.eyeGroup);
 
         const self=this;
 
@@ -83,7 +94,7 @@ export class EyeView extends A2AppExampleCustomNodeView{
         this.subscribe(this.model.addStateKeyListener('transform', ()=>{
             let minv = self.model.transform.getMatrix().getInverse();
             if(minv){
-                Mat4.FromMat3(minv).assignTo(self.eyeObject.matrix);
+                self.eyeGroup.setTransform(minv);
             }
         }));
 
@@ -91,7 +102,8 @@ export class EyeView extends A2AppExampleCustomNodeView{
             self.targetResponse();
         }));
         this.subscribe(this.model.addStateKeyListener('dilation', ()=>{
-            Mat4.Scale2D([self.model.dilation,self.model.dilation]).assignTo(self.pupil.threejs.matrix);
+            self.pupil.setTransform(Mat3.Scale2D([self.model.dilation,self.model.dilation]));
+            // Mat4.Scale2D([self.model.dilation,self.model.dilation]).assignTo(self.pupil.threejs.matrix);
         }));
         this.subscribe(this.model.addStateKeyListener('color',()=>{
             self.iris.setColor(self.model.color);
@@ -128,13 +140,12 @@ export class EyeView extends A2AppExampleCustomNodeView{
             if(timePassed>self.model.blinkDuration){
                 // blink is over, let's unsubscribe, reset the transform, and return.
                 self.unsubscribe("blinking");
-                Mat4.FromMat3(minv).assignTo(self.eyeObject.matrix);
+                self.eyeGroup.setTransform(minv);
                 return;
             }
             // mid-blink... let's scale the eye down to 0 in the y dimension and then back again.
             let scaleY = Mat4.Scale2D([1.0, Math.abs(-0.5+(timePassed/self.model.blinkDuration))*2]);
-            // we will assign our scale to the eyeObject Object3D that we created...
-            scaleY.assignTo(self.eyeObject.matrix);
+            self.eyeGroup.setMatrix(scaleY);
         }), "blinking")
     }
 

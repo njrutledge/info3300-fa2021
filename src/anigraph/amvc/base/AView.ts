@@ -8,6 +8,7 @@ import {AObject} from "../../aobject/AObject";
 import {AControllerInterface} from "./AController";
 import {ARenderElement} from "../../arender/ARenderElement";
 import {AModel} from "./AModel";
+import {ARenderObject} from "../../arender";
 
 
 export interface AViewClassInterface extends Function {new (...args:any[]): AView<AModel>}
@@ -24,7 +25,7 @@ export abstract class AView<NodeModelType extends AModel> extends AObject{
     abstract threejs: THREE.Object3D;
     abstract controller:AControllerInterface<NodeModelType>;
 
-    addElement(element:ARenderElement){
+    addElement(element:ARenderObject){
         this.threejs.add(element.threejs);
     }
 
