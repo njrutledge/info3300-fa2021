@@ -4,9 +4,9 @@ import {ADragInteraction} from "../../../ainteraction/ADragInteraction";
 import {AInteractionEvent} from "../../../ainteraction";
 import {A2DSceneController, A2DSceneModel} from "../scene";
 import {GetAppState} from "../../AAppState";
-import {Base2DAppAppState, Base2DAppModel} from "../../../apps/Base2DApp";
 import {AniGraphEnums} from "../../../basictypes";
 import {A2DAppState} from "../../A2DAppState";
+import {Base2DAppModel} from "../../../apps/Base2DApp";
 
 export class A2DSceneNodeController<NodeModelType extends A2DSceneNodeModel> extends ASceneNodeController<NodeModelType>{
     addDragPositionInteraction(){

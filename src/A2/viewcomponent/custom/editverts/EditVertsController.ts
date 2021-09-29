@@ -9,7 +9,6 @@ import {
 } from "../../../../anigraph";
 import {EditVertsModel} from "./EditVertsModel";
 import {EditVertsView} from "./EditVertsView";
-import {Base2DAppAppState, Base2DAppModel} from "../../../../anigraph/apps/Base2DApp";
 import {A2AppGlobalState} from "../../../A2AppGlobalState";
 
 

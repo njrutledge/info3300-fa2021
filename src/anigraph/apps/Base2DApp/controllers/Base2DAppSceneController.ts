@@ -11,7 +11,8 @@ import {
 import {Base2DAppNodeView} from "../views";
 import {Base2DAppModel} from "../models/Base2DAppModel";
 import {Base2DAppNodeController} from "./Base2DAppNodeController";
-import {Base2DAppAppState} from "../Base2DAppAppState";
+// import {Base2DAppAppState} from "../Base2DAppAppState";
+import {GetAppState} from "src/anigraph";
 
 class Base2DAppSceneControllerBase<NodeModelType extends A2DSceneNodeModel, SceneModelType extends A2DSceneModel<NodeModelType>> extends A2DSceneController<NodeModelType, SceneModelType> {
     public view!: A2DSceneView<NodeModelType, SceneModelType>;
@@ -52,7 +53,7 @@ export class Base2DAppSceneController<NodeModelType extends Base2DAppModel, Scen
 
     updateCreateShapeInteraction(){
         const self = this;
-        const appState = (Base2DAppAppState.GetAppState() as unknown as Base2DAppAppState);
+        const appState = GetAppState();
         const CreateShapeName = AniGraphEnums.CreateShapeInteractionName;
         if(this.isInteractionModeDefined(CreateShapeName)){
             this.clearInteractionMode(CreateShapeName);
@@ -60,6 +61,7 @@ export class Base2DAppSceneController<NodeModelType extends Base2DAppModel, Scen
         this.defineInteractionMode(CreateShapeName);
         this.setCurrentInteractionMode(CreateShapeName);
 
+        // @ts-ignore
         let CurrentNodeControllerClass = self.ModelClassMap[appState.currentNewModelTypeName].controllerClass;
         let createShapeInteraction:AInteraction;
         if(CurrentNodeControllerClass && 'CreateShapeInteraction' in CurrentNodeControllerClass){
@@ -72,10 +74,11 @@ export class Base2DAppSceneController<NodeModelType extends Base2DAppModel, Scen
                         let newShape = this.model.NewNode();
                         newShape.verts.position.push(event.cursorPosition);
                         newShape.verts.position.push(event.cursorPosition);
+                        // @ts-ignore
                         newShape.color = appState.selectedColor;
                         self.sceneController.model.addNode(newShape);
                         self.selectModel(newShape);
-                        Base2DAppAppState.GetAppState().freezeSelection();
+                        GetAppState().freezeSelection();
                         interaction.setInteractionState("newShape", newShape);
                         // this.disableDraggingOnSelected();
                     }else{
