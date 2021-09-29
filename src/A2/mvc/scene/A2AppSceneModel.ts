@@ -1,6 +1,5 @@
 import {A2DSceneModel, ASerializable, GetAppState} from "src/anigraph";
 import {A2AppSceneNodeModel} from "../scenenode";
-import {Base2DAppAppState, Base2DAppModel} from "../../../anigraph/apps/Base2DApp";
 import {A2AppGlobalState} from "../../A2AppGlobalState";
 
 @ASerializable("A2AppSceneModel")

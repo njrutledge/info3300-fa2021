@@ -4,7 +4,7 @@ import {
     AInteractionEventListener,
     AReceivesInteractionsInterface
 } from "./AInteraction";
-import {CallbackType} from "../aevents";
+import {CallbackType} from "../basictypes";
 
 export class AClickInteraction extends AInteraction{
     static Create(element:any, clickCallback?:CallbackType, handle?:string, ...args:any[]){

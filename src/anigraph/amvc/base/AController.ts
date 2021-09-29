@@ -114,6 +114,8 @@ export abstract class AController<ModelType extends AModel> extends AObject{
         return interaction;
     }
 
+
+
     activateInteractions(){
         this.interactionMode.activate();
     }
@@ -127,6 +129,14 @@ export abstract class AController<ModelType extends AModel> extends AObject{
 
     defineInteractionMode(name:string, mode?:AInteractionMode){
         this._interactions.defineMode(name, mode);
+    }
+
+    clearInteractionMode(name:string){
+        this._interactions.undefineMode(name)
+    }
+
+    isInteractionModeDefined(name:string){
+        return this._interactions.modeIsDefined(name);
     }
 
     get model(){

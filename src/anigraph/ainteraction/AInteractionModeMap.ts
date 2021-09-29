@@ -40,7 +40,12 @@ export class AInteractionModeMap{
         }
 
     }
-    undefineMode(name:string, mode:AInteractionMode){
+
+    modeIsDefined(name:string){
+        return name in this.modes;
+    }
+
+    undefineMode(name:string){
         if(name in this.modes){
             this.modes[name].deactivate();
             delete this.modes[name];

@@ -1,5 +1,5 @@
 import {AInteraction, AInteractionEvent, AInteractionEventListener,} from "./AInteraction";
-import {CallbackType} from "../aevents";
+import {CallbackType} from "../basictypes";
 import {Vec2} from "../amath";
 
 

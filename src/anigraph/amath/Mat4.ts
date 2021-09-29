@@ -549,7 +549,7 @@ export class Mat4 extends Matrix{
 
 
 
-        return cfunc(	this.elements[0]*m.elements[0]+this.elements[4]*m.elements[1]+this.elements[8]*m.elements[2]+this.elements[12]*m.elements[3],
+        return new cfunc(	this.elements[0]*m.elements[0]+this.elements[4]*m.elements[1]+this.elements[8]*m.elements[2]+this.elements[12]*m.elements[3],
 
             this.elements[1]*m.elements[0]+this.elements[5]*m.elements[1]+this.elements[9]*m.elements[2]+this.elements[13]*m.elements[3],
 

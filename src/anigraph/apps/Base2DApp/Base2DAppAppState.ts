@@ -60,6 +60,15 @@ export abstract class Basic2DAppState<NodeModelType extends A2DSceneNodeModel, S
         // this.selectedColor = new Color(0.5, 0.5, 0.5);
         this.selectedColor = Color.Random();
         this._isCreatingShape = false;
+
+        const self = this;
+        this.subscribe(this.addStateKeyListener('_currentNewModelTypeName',()=>{
+            for(let c in this.sceneControllers){
+                // @ts-ignore
+                this.sceneControllers[c].updateCreateShapeInteraction()
+            }
+        }));
+
     }
 
     getControlPanelStandardSpec(): {} {

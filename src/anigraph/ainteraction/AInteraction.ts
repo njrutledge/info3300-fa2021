@@ -249,7 +249,7 @@ export class AInteraction extends ACallbackSwitch {
                     }
 
                     //check to see if we are an ancestor of the intersection
-                    if (this.element.type === "Object3D") {
+                    if (this.element.type === "Object3D" || this.element.type === "Group") {
                         let elementIsAncestor = false;
                         iobj.traverseAncestors((ancestor: Object3D) => {
                                 if (ancestor === self.element) {

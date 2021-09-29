@@ -75,14 +75,18 @@ export class NodeTransform2D implements NodeTransform<Vec2, Mat3>{
      * `src/anigraph/amath/Precision.ts`. These are useful when dealing with
      * floating point inaccuracies and other small numbers.
      *
-     * Note: do not let the scale factor be less than epsilon.
+     * Note: We will always provide an input position in the tests we use for grading,
+     * but the recommended behavior when no position is provided is to keep whatever
+     * the previous position value was unchanged.
      *
      * @param m the affine transformation matrix
      * @param position the starting positon
      */
     setWithMatrix(m: Mat3, position?: Vec2) {
         // TODO: Replace the following lines with your code
-        this.position = new Vec2(0, 0);
+        if(position){
+            this.position=position;
+        }
         this.anchor = new Vec2(0, 0);
         this.scale = new Vec2(1, 1);
         this.rotation = 0;

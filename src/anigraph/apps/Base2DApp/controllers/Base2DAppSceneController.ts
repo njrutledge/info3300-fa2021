@@ -3,15 +3,16 @@ import {
     A2DSceneModel,
     A2DSceneNodeModel,
     A2DSceneView,
-    ADragInteraction,
-    AInteractionEvent,
+    ADragInteraction, AInteraction,
+    AInteractionEvent, AniGraphEnums,
     ASceneView,
     AStaticClickInteraction
 } from "src/anigraph";
 import {Base2DAppNodeView} from "../views";
 import {Base2DAppModel} from "../models/Base2DAppModel";
 import {Base2DAppNodeController} from "./Base2DAppNodeController";
-import {Base2DAppAppState} from "../Base2DAppAppState";
+// import {Base2DAppAppState} from "../Base2DAppAppState";
+import {GetAppState} from "src/anigraph";
 
 class Base2DAppSceneControllerBase<NodeModelType extends A2DSceneNodeModel, SceneModelType extends A2DSceneModel<NodeModelType>> extends A2DSceneController<NodeModelType, SceneModelType> {
     public view!: A2DSceneView<NodeModelType, SceneModelType>;
@@ -50,47 +51,51 @@ export class Base2DAppSceneController<NodeModelType extends Base2DAppModel, Scen
     }
 
 
-    addCreateShapeInteraction(){
-
-    }
-
-    /**
-     * Gets called in init() function
-     */
-    initInteractions() {
-        // initialize scene-level interactions here
-        // example interaction below
+    updateCreateShapeInteraction(){
         const self = this;
-        const appState = (Base2DAppAppState.GetAppState() as unknown as Base2DAppAppState);
-        const CreateShapeName = "CreateShape";
+        const appState = GetAppState();
+        const CreateShapeName = AniGraphEnums.CreateShapeInteractionName;
+        if(this.isInteractionModeDefined(CreateShapeName)){
+            this.clearInteractionMode(CreateShapeName);
+        }
         this.defineInteractionMode(CreateShapeName);
         this.setCurrentInteractionMode(CreateShapeName);
-        const createShapeInteraction = ADragInteraction.Create(this.backgroundElement,
-            (interaction:ADragInteraction, event: AInteractionEvent) => {
-            if(interaction.getInteractionState("newShape")===undefined){
-                let newShape = this.model.NewNode();
-                newShape.verts.position.push(event.cursorPosition);
-                newShape.verts.position.push(event.cursorPosition);
-                newShape.color = appState.selectedColor;
-                self.sceneController.model.addNode(newShape);
-                self.selectModel(newShape);
-                Base2DAppAppState.GetAppState().freezeSelection();
-                interaction.setInteractionState("newShape", newShape);
-                // this.disableDraggingOnSelected();
-            }else{
-                (interaction.getInteractionState("newShape") as Base2DAppModel).verts.addVertex(event.cursorPosition);
-            }
-        }, (interaction, event)=>{
-            let newshape:Base2DAppModel = interaction.getInteractionState("newShape");
-            if(newshape) {
-                newshape.verts.position.setAt(newshape.verts.length - 1, event.cursorPosition);
-            }else{
-                throw new Error("Should not be dragging on create shape without a selected model...");
-            }
-        }, (interaction, event)=>{
-            // interaction.setInteractionState("newShape", undefined);
-        },
-            CreateShapeName);
+
+        // @ts-ignore
+        let CurrentNodeControllerClass = self.ModelClassMap[appState.currentNewModelTypeName].controllerClass;
+        let createShapeInteraction:AInteraction;
+        if(CurrentNodeControllerClass && 'CreateShapeInteraction' in CurrentNodeControllerClass){
+            // @ts-ignore
+            createShapeInteraction = CurrentNodeControllerClass.CreateShapeInteraction(this, CreateShapeName);
+        }else{
+            createShapeInteraction = ADragInteraction.Create(this.backgroundElement,
+                (interaction:ADragInteraction, event: AInteractionEvent) => {
+                    if(interaction.getInteractionState("newShape")===undefined){
+                        let newShape = this.model.NewNode();
+                        newShape.verts.position.push(event.cursorPosition);
+                        newShape.verts.position.push(event.cursorPosition);
+                        // @ts-ignore
+                        newShape.color = appState.selectedColor;
+                        self.sceneController.model.addNode(newShape);
+                        self.selectModel(newShape);
+                        GetAppState().freezeSelection();
+                        interaction.setInteractionState("newShape", newShape);
+                        // this.disableDraggingOnSelected();
+                    }else{
+                        (interaction.getInteractionState("newShape") as Base2DAppModel).verts.addVertex(event.cursorPosition);
+                    }
+                }, (interaction, event)=>{
+                    let newshape:Base2DAppModel = interaction.getInteractionState("newShape");
+                    if(newshape) {
+                        newshape.verts.position.setAt(newshape.verts.length - 1, event.cursorPosition);
+                    }else{
+                        throw new Error("Should not be dragging on create shape without a selected model...");
+                    }
+                }, (interaction, event)=>{
+                    // interaction.setInteractionState("newShape", undefined);
+                },
+                CreateShapeName);
+        }
 
         this.getInteractionMode(CreateShapeName).setBeforeActivateCallback(()=>{
             self.view.setBackgroundOrder(ASceneView.BackgroundOrder.Front);
@@ -100,7 +105,16 @@ export class Base2DAppSceneController<NodeModelType extends Base2DAppModel, Scen
         });
         this.addInteraction(createShapeInteraction);
         this.setCurrentInteractionMode();
+    }
 
+    /**
+     * Gets called in init() function
+     */
+    initInteractions() {
+        // initialize scene-level interactions here
+        // example interaction below
+        const self = this;
+        this.updateCreateShapeInteraction();
         /**
          * Deselection controller:
          * controller placed on the background element that deselects on click
@@ -108,6 +122,7 @@ export class Base2DAppSceneController<NodeModelType extends Base2DAppModel, Scen
         this.addInteraction(AStaticClickInteraction.Create(this.backgroundElement, (event: AInteractionEvent) => {
             self.selectModel(undefined, event);
         }))
+
     }
 }
 

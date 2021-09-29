@@ -1,6 +1,5 @@
 import {v4 as uuidv4} from "uuid";
 
-export type CallbackType =(...args:any[])=>any;
 
 export abstract class ACallbackSwitch{
     // public callback:(...args:any[])=>any;

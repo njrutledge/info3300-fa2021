@@ -8,7 +8,6 @@ import {ASelectionModel, SelectionEvents} from "./base/selection";
 import React, {useEffect, useRef} from "react";
 import {v4 as uuidv4} from 'uuid';
 import {ClassInterface} from "../basictypes";
-import {CallbackType} from "../aevents";
 
 export const SceneControllerIDs = {
     default:"default",
@@ -226,7 +225,9 @@ export abstract class AAppState<NodeModelType extends ASceneNodeModel, SceneMode
     }
 
 
-    AppComponent(sceneControllerClass:ClassInterface<ASceneController<NodeModelType,SceneModelType>>, name?:string, classSpec?:AMVCNodeClassSpec<NodeModelType>|AMVCNodeClassSpec<NodeModelType>[]){
+    AppComponent(sceneControllerClass:ClassInterface<ASceneController<NodeModelType,SceneModelType>>,
+                 name?:string,
+                 classSpec?:AMVCNodeClassSpec<NodeModelType>|AMVCNodeClassSpec<NodeModelType>[]){
         const self = this;
         async function initThreeJSContext(container: HTMLDivElement) {
             let sceneController = new sceneControllerClass(container);
