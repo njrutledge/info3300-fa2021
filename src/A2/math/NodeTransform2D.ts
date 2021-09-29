@@ -75,8 +75,6 @@ export class NodeTransform2D implements NodeTransform<Vec2, Mat3>{
      * `src/anigraph/amath/Precision.ts`. These are useful when dealing with
      * floating point inaccuracies and other small numbers.
      *
-     * Note: do not let the scale factor be less than epsilon.
-     *
      * Note: We will always provide an input position in the tests we use for grading,
      * but the recommended behavior when no position is provided is to keep whatever
      * the previous position value was unchanged.
