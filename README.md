@@ -8,7 +8,7 @@ Before you read this, make sure to go over [the AniGraph README.md](src/anigraph
 ### Setup
 Setup is the same as Assignment 1. We will be forking, using TypeScript, and running the app in your web browser.
 
-Reference the guides provided for [Forking](https://github.coecis.cornell.edu/CS4620-F2021-Staff/assignment2-dev/blob/main/Forking.md) and [Setup](https://github.coecis.cornell.edu/CS4620-F2021-Staff/assignment2-dev/blob/main/Setup.md), and make sure to follow the dependency installation instructions under "[At the start of each assignment](https://github.coecis.cornell.edu/CS4620-F2021-Staff/assignment2-dev/blob/main/Setup.md#at-the-start-of-each-assignment)".
+Reference the guides provided for [Forking](/Forking.md) and [Setup](/Setup.md), and make sure to follow the dependency installation instructions under "[At the start of each assignment](/Setup.md#at-the-start-of-each-assignment)".
 
 ## Navigating the Starter Code
 
