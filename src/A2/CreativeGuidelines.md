@@ -8,12 +8,12 @@ CS4620 students should implement at least one of the following. CS5620 should im
 - **Custom View Classes**: should moify or replace a model's geometry in some way. Simply changing its color or pose are not enough.
 - **Custom Controller Classes**: Should allow for some sort of spatially-sensitive interaction (e.g., when the user clicks and/or drags on a specific element it triggers an animation or response). Simply adding aslider to the GUI panel does NOT count as a custom controller.
 
-You should record a short video demo of your project describing what you implemented and showing off its functionality. Your submission should include a group part and a small individual report. The group part will include:
-- A short summary report on what you did. If your video demonstration is well-made and self-contained then this can be a simple paragraph summarizing what it shows.
+You should record a short video demo of your project describing what you implemented and showing off its functionality. Your submission should include:
+- A small report on what you did, including who contributed to what pieces of the work. If your video demonstration is well-made and self-contained then this can be as simple as a paragraph descibing the contributions of each member in your group.
 - Your video demo of what you built. This should be no longer than 90 seconds. If there are technical details you can't cover in that time, you can include them in your report.
 - A Zip of your code. We may run it to test out some features, or look through it to verify certain properties of your implementation. We may also run plagiarism detection/analysis on it if there are any concerns about a possible academic integrity violation.
 
-In addition, we will ask each of you individually to submit a short summary of which parts of the assignment each member implemented or contributed to.
+In addition, we will ask each of you individually to submit a short summary of which parts of the assignment each member implemented or contributed to. We may make adjustments to grades in cases where contributions are particularly lopsided, but by default will assign one grade per group.
 
 These are the basic requirements. If you meet them in the most minimal sense (provided you don't just turn in the example code we gave you), you will at least get a passing grade.
 
