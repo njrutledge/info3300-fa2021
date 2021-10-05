@@ -1,0 +1,57 @@
+<html>
+    <head>
+        <script src="https://d3js.org/d3.v7.min.js"></script>
+    </head>
+    <body>
+        <p>
+            <svg id="A" width="500" height="500"></svg>
+            <script>
+                       d3.csv("spotify_dataset.csv", d3.autoType )
+    .then( (data) => {
+        data.forEach( d => {
+            d['Streams'] = Number( d['Streams'].replace(/,/g, "") );
+            console.log(d['Streams']);
+        });
+        console.log(data);
+        let svg = d3.select("svg#A");
+        
+        const chartWidth = svg.attr("width");
+        const chartHeight = svg.attr("height");
+
+        let streamExtent = d3.extent(data, d => d['Streams']);
+        streamExtent[0] = 0;
+        const streamScaleX = d3.scaleLinear().domain(streamExtent).range([0,chartWidth-5]);
+        const streamScaleY = d3.scaleLinear().domain(streamExtent).range([chartHeight, 5]);
+
+
+        let energyExtent = d3.extent(data, d => d['Energy']);
+        energyExtent[0] = 0;
+        console.log(energyExtent);
+        const energyScaleX = d3.scaleLinear().domain(energyExtent).range([0, chartWidth-5]);
+        const energyScaleY = d3.scaleLinear().domain(energyExtent).range([chartHeight, 5]);
+
+        let artistFollowerExtent = d3.extent(data, d => d['Artist Followers']);
+        artistFollowerExtent[0] = 0;
+        console.log(artistFollowerExtent);
+        const artistFollowerScaleX = d3.scaleLinear().domain(artistFollowerExtent).range([0, chartWidth-5]);
+        const artistFollowerScaleY = d3.scaleLinear().domain(artistFollowerExtent).range([chartHeight, 5]);
+
+        let danceabilityExtent = d3.exent(data, d => d['Danceability']);
+        danceabilityExtent[0] = 0;
+        const danceabilityScaleX = d3.scaleLinear().domain(danceabilityExtent).range([0,chartWidth-5]);
+        const danceabilityScaleY = d3.scaleLinear().domain(danceabilityExtent).range([chartHeight, 5]);
+
+        data.forEach( (d, i) => {
+    
+     svg.append("circle")
+        .attr("cx", artistFollowerScaleX(d['Artist Followers']))
+        .attr("cy", streamScaleY(d['Streams']))
+        .attr("r", "3")
+        .attr("opacity", 0.8)
+        .style("fill", "red")
+        });
+    })
+        </script>
+        </p>
+    </body>
+</html>
