@@ -1,0 +1,180 @@
+<html>
+
+<head>
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+  <style>
+    .p2 {
+      background-color: black;
+    }
+  </style>
+</head>
+
+<body>
+  <p id="p1"> Problem 1: <br>
+    <svg id="A" width="400" height="400">
+    </svg>
+    <br>
+    <br>
+    <svg id="D" width="400" height="400">
+    </svg>
+    <br>
+    <br>
+    <svg id="E" width="400" height="400">
+    </svg>
+    <script>
+      let svg = d3.select("svg#A");
+      const chartWidth = svg.attr("width");
+      const chartHeight = svg.attr("height");
+
+      let annot = svg.append("g").attr("id", "annotations");
+
+      d3.json("diamonds.json", d3.autotype)
+        .then((data) => {
+          data.forEach(d => {
+            //its more fun, and nobody has to know ;)
+            d["carrot"] = d['carat']
+          });
+
+          let carrotExtent = d3.extent(data, d => d['carrot']);
+          carrotExtent[0] = 0;
+          const carrotScale = d3.scaleLinear().domain(carrotExtent).range([0, chartWidth - 5]);
+
+          let priceExtent = d3.extent(data, d => d['price']);
+          priceExtent[0] = 0;
+          const priceScale = d3.scaleLinear().domain(priceExtent).range([chartHeight, 5]);
+
+          for (let i = 0; i <= carrotExtent[1]; i++) {
+            svg.append("line")
+              .attr("x1", carrotScale(i))
+              .attr("x2", carrotScale(i))
+              .attr("y1", "0")
+              .attr("y2", chartHeight)
+              .style("stroke", "gray")
+          }
+          for (let j = 0; j < priceExtent[1]; j = j + 1000) {
+            svg.append("line")
+              .attr("x1", "0")
+              .attr("x2", chartWidth)
+              .attr("y1", priceScale(j))
+              .attr("y2", priceScale(j))
+              .style("stroke", "gray")
+          }
+
+          data.forEach((d, i) => {
+            let circle = svg.append("circle")
+              .attr("cx", Math.floor(carrotScale(d["carrot"])))
+              .attr("cy", Math.floor(priceScale(d["price"])))
+              .attr("r", "3")
+              .style("fill", "darkblue")
+              .attr("opacity", 0.4)
+          });
+          //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+          svg = d3.select("svg#D");
+          const colorRatingScale = d3.scaleLinear().domain([0, 8]).range([0, chartWidth - 5]);
+
+          for (let i = 0; i < 8; i++) {
+            svg.append("line")
+              .attr("x1", colorRatingScale(i))
+              .attr("x2", colorRatingScale(i))
+              .attr("y1", "0")
+              .attr("y2", chartHeight)
+              .style("stroke", "gray")
+          }
+          for (let j = 0; j < priceExtent[1]; j = j + 1000) {
+            svg.append("line")
+              .attr("x1", "0")
+              .attr("x2", chartWidth)
+              .attr("y1", priceScale(j))
+              .attr("y2", priceScale(j))
+              .style("stroke", "gray")
+          }
+
+          data.forEach((d, i) => {
+            let circle = svg.append("circle")
+              .attr("cx", Math.floor(colorRatingScale(d["color_rating"])) + Math.floor((Math.random() * 10 - 5)))
+              .attr("cy", Math.floor(priceScale(d["price"])) + Math.floor((Math.random() * 10 - 5)))
+              .attr("r", "3")
+              .style("fill", "darkgreen")
+              .attr("opacity", 0.3)
+          });
+          //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+          svg = d3.select("svg#E");
+          const pricePerCarrotExtent = d3.extent(data, d => d['price'] / d['carrot']);
+          pricePerCarrotExtent[0] = 0;
+          const pricePerCarrotScale = d3.scaleLinear().domain(pricePerCarrotExtent).range([chartHeight, 5]);
+
+          for (let i = 0; i < 8; i++) {
+            svg.append("line")
+              .attr("x1", colorRatingScale(i))
+              .attr("x2", colorRatingScale(i))
+              .attr("y1", "0")
+              .attr("y2", chartHeight)
+              .style("stroke", "gray")
+          }
+          for (let j = 0; j < pricePerCarrotExtent[1]; j = j + 1000) {
+            svg.append("line")
+              .attr("x1", "0")
+              .attr("x2", chartWidth)
+              .attr("y1", pricePerCarrotScale(j))
+              .attr("y2", pricePerCarrotScale(j))
+              .style("stroke", "gray")
+          }
+
+          data.forEach((d, i) => {
+            let circle = svg.append("circle")
+              .attr("cx", Math.floor(colorRatingScale(d["color_rating"])) + Math.floor((Math.random() * 10 - 5)))
+              .attr("cy", Math.floor(pricePerCarrotScale(d["price"] / d['carrot'])) + Math.floor((Math.random() * 10 - 5)))
+              .attr("r", "3")
+              .style("fill", "darkred")
+              .attr("opacity", 0.3)
+          });
+        },
+          (error) => { console.log(error) });
+
+
+    </script>
+    <br>
+    E. The outliers/tops of the red graph form an upward trend in price per carat when increasing the quality of the
+    diamond, perhaps misleading the viewer into taking this to be a trend.
+  </p>
+  <p id="p2"> Problem 2 <br>
+    <svg id="p2" class="p2 A" width="500" height="500"></svg>
+    <script>
+      d3.csv("NCAA_shots.csv").then((data) => {
+        data.forEach(d => {
+          d['x'] = Number(d['x']) * 5;
+          d['y'] = Number(d['y']) * 5;
+          d['width'] = Number(d['width']) * 5;
+          d['height'] = Number(d['height']) * 5;
+          d['attempt'] = Number(d['attempt']);
+          d['log_attempt'] = Number(d['log_attempt']);
+          d['made'] = Number(d['made']);
+          d['missed'] = Number(d['missed']);
+
+        });
+        const attemptExtent = d3.extent(data, d => d['log_attempt']);
+        console.log(attemptExtent);
+        const colorScale = d3.scaleSequential(d3.interpolateViridis).domain(attemptExtent);
+        let svg = d3.select("svg#p2");
+        data.forEach(d => {
+          svg.append("rect")
+            .attr("x", d['x'])
+            .attr("y", d['y'])
+            .attr("width", d['width'])
+            .attr("height", d['height'])
+            .style("fill", colorScale(d['log_attempt']))
+        });
+
+      },
+        (error) => { console.log(error) });
+    </script>
+    <br>
+    One advantage to using the logarithmic scale is the ability to see changes in a large range of values, especially
+    one with an exponential distribution (use the log to kill the exponentiation).
+    <br>
+    One disadvantage to using a logarithmic scale over a linear scale is that small fluctuations are entirely lost to
+    the scale, espcially small fluctuations at high values.
+  </p>
+</body>
+
+</html>

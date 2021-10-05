@@ -1,0 +1,35 @@
+<html>
+
+<head>
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+
+</head>
+
+<body>
+  <p id="p1">
+
+  </p>
+  <p id="p2">
+
+  </p>
+  <svg id="p1" width="420" height="420">
+
+  </svg>
+  <script>
+    let array = [];
+    let index = 0;
+    for (let i = -160; i <= 160; i += 16) {
+      for (let j = -160; j <= 160; j += 16) {
+        array[index] = {
+          "a": i,
+          "b": j
+        }
+        index++;
+      }
+    }
+    const aScale = d3.scaleLinear().domain([-160, 160]).range([10, 410])
+    const bScale = d3.scaleLinear().domain([-160, 160]).range([410, 10])
+  </script>
+</body>
+
+</html>
