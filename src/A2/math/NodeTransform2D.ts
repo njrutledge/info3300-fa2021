@@ -37,7 +37,7 @@ export class NodeTransform2D implements NodeTransform<Vec2, Mat3>{
     }
 
     clone() {
-        return new NodeTransform2D(this.position, this.anchor, this.scale, this.rotation);
+        return new NodeTransform2D(this.position, this.anchor, this.scale.clone(), this.rotation);
     }
 
     /**
