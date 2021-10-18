@@ -2,34 +2,242 @@
 
 <head>
   <script src="https://d3js.org/d3.v7.min.js"></script>
+  <style>
+    .gridlines .domain {
+      display: none;
+    }
+
+    .gridlines line {
+      stroke: #bbb;
+    }
+  </style>
 
 </head>
 
 <body>
   <p id="p1">
+    <svg id="p1" width="420" height="420">
 
+    </svg>
+    <br>
+    <input type="range" id="AAAAA" min="0" max="200" step="1" value="80">
+
+    <script>
+      let array = [];
+      let index = 0;
+      for (let i = -160; i <= 160; i += 16) {
+        for (let j = -160; j <= 160; j += 16) {
+          array[index] = {
+            "a": i,
+            "b": j
+          }
+          index++;
+        }
+      }
+      const aScale = d3.scaleLinear().domain([-160, 160]).range([10, 410]);
+      const bScale = d3.scaleLinear().domain([-160, 160]).range([410, 10]);
+      let svg = d3.select("svg#p1");
+
+      function showCircles(luminosity) {
+        svg.selectAll('circle').data(array)
+          .join(enter => {
+            enter.append('circle')
+              .attr("cx", d => aScale(d.a))
+              .attr("cy", d => bScale(d.b))
+              .attr("r", "10")
+              .attr("fill", d => d3.lab(luminosity, d.a, d.b))
+          },
+            update => update.attr("fill", d => d3.lab(luminosity, d.a, d.b)),
+            exit => exit.remove()
+          )
+      };
+      showCircles(80);
+      d3.select('input#AAAAA').on('input', function () { showCircles(this.value) });
+
+    </script>
   </p>
   <p id="p2">
+    A: I removed anything with N/A or NA as the country or the region. These were the bad ones from the console.log
+    lookthrough. I removed 84 bad ones.
+    <br>
+    B: I chose to model my axes after the September 29th lecture's svg's axes and gridlines, because it looked nice. I
+    made my gridlines gray because it doesn't hinder the graph, and looked nice. Points don't range many values, so its
+    a linear scale to look nice. price ranges rather large, so its a log scale to make it look nice. ColorScale is 4
+    random nice colors.
+    <br>
+    C: I gave the circles arbitrary radii until it looked nice. I changed the opacity until it looked nice on overlap.
+    Advantage of jitter: makes it look nicer. Disadvantage of jitter: points no longer in correct places, so the data is
+    slightly wrong by a random amount (not nice).
+    <br>
+    D: benefit: its nice to know the wine so its not a random data point that means literally nothing other than the
+    state its from. It is not nice in areas with lots of overlap, as its hard to get the right one.
+    <br>
+    <svg id="dummythicc" width="800" height="500">
+      <text id="whoCaresWhatItIs" x="700" y="440" text-anchor="end" alignment-baseline="hanging"></text>
+    </svg>
+  <div>
+    <span id="Calidummy" style="color:#A8E10C"> California</span>
+    <span id="NewPork" style="color:#8A6FDF"> New York</span>
+    <span id="Organ" style="color:#FFDB15"> Oregon</span>
+    <span id="George" style="color:#FF5765"> Washington</span>
+    <span id="Clerr" style="color:#000000"> Clear</span>
 
-  </p>
-  <svg id="p1" width="420" height="420">
-
-  </svg>
+  </div>
   <script>
-    let array = [];
-    let index = 0;
-    for (let i = -160; i <= 160; i += 16) {
-      for (let j = -160; j <= 160; j += 16) {
-        array[index] = {
-          "a": i,
-          "b": j
+    const margin = { top: 10, right: 10, bottom: 50, left: 50 };
+    const chartWidth = 800 - margin.left - margin.right;
+    const chartHeight = 500 - margin.bottom - margin.top;
+
+    d3.json('wines.json', d3.autoType)
+      .then((wineData) => {
+        wineData.forEach(d => {
+          d['points'] = Number(d['points']);
+          d['price'] = Number(d['price'].replace(/\$/g, "").replace(/,/g, ""));
+          d['numState'] = d['state'] === "California" ? 0 : d['state'] === "New York" ? 1 : d['state'] === "Oregon" ? 2 : d['state'] === "Washington" ? 3 : -1;
+        })
+        wineData = wineData.filter(d => { return d['country'] != 'N/A' && d['country'] != 'NA' && d['region_1'] != 'N/A' && d['region_1'] != 'NA' })
+        console.log(wineData.length);
+
+
+        const priceExtent = d3.extent(wineData, d => d['price']);
+        const priceScale = d3.scaleLog().domain(priceExtent).range([0, chartWidth]);
+        const pointsExtent = d3.extent(wineData, d => d['points']);
+        const pointsScale = d3.scaleLinear().domain(pointsExtent).range([chartHeight, 0]);
+        const colorScale = i => {
+          let array = [d3.rgb('#A8E10C'), d3.rgb("#8A6FDF"), d3.rgb('#FFDB15'), d3.rgb('#FF5765')]
+          return array[i];
         }
-        index++;
-      }
-    }
-    const aScale = d3.scaleLinear().domain([-160, 160]).range([10, 410])
-    const bScale = d3.scaleLinear().domain([-160, 160]).range([410, 10])
+        console.log(pointsExtent)
+        let svg = d3.select("svg#dummythicc");
+
+        const leftAxis = d3.axisLeft(pointsScale)
+        const leftGridlines = d3.axisLeft(pointsScale)
+          .tickSize(-chartWidth - 10)
+          .tickFormat("");
+
+        svg.append("g")
+          .attr("class", "y axis")
+          .attr("transform", `translate(${margin.left - 10},${margin.top})`)
+          .call(leftAxis);
+        svg.append("g")
+          .attr("class", "y gridlines")
+          .attr("transform", `translate(${margin.left - 10},${margin.top})`)
+          .call(leftGridlines);
+
+        let bottomAxis = d3.axisBottom(priceScale)
+        let bottomGridlines = d3.axisBottom(priceScale)
+          .tickSize(-chartHeight - 10)
+          .tickFormat("")
+
+        svg.append("g")
+          .attr("class", "x axis")
+          .attr("transform", `translate(${margin.left},${chartHeight + margin.top + 10})`)
+          .call(bottomAxis);
+        svg.append("g")
+          .attr("class", "x gridlines")
+          .attr("transform", `translate(${margin.left},${chartHeight + margin.top + 10})`)
+          .call(bottomGridlines);
+
+        let chartReg = svg.append("g")
+          .attr("id", "daPointz")
+          .attr("transform", `translate(${margin.left},${margin.top})`);
+
+        function jitter() {
+          return Math.floor(Math.random() * 8 - 4);
+        }
+
+        wineData.forEach(d => {
+          let circle = chartReg.append("circle")
+            .attr("state", d['state'])
+            .attr("cx", priceScale(d['price']) + jitter())
+            .attr("cy", pointsScale(d['points']) + jitter())
+            .attr("r", "3")
+            .attr("opacity", ".8")
+            .style("fill", colorScale(d['numState']))
+
+
+          circle.on("mouseover", function () {
+            d3.select(this)
+              .attr("r", "5")
+            d3.select("#whoCaresWhatItIs").text(d['title']);
+
+          });
+
+          circle.on("mouseout", function () {
+            d3.select(this)
+              .attr("r", "3")
+
+            d3.select("#whoCaresWhatItIs").text("");
+          });
+        });
+        d3.select("#Calidummy").on("mouseover", function () {
+          console.log(chartReg.selectAll('circle'));
+          chartReg.selectAll("circle")
+            .data(wineData)
+            .join(
+              enter => {
+              },
+              update => { update.attr("opacity", d => d["state"] === "California" ? .8 : .2) },
+              exit => {
+                exit.remove()
+              }
+            )
+        })
+        d3.select("#Organ").on("mouseover", function () {
+          console.log(chartReg.selectAll('circle'));
+          chartReg.selectAll("circle")
+            .data(wineData)
+            .join(
+              enter => {
+              },
+              update => { update.attr("opacity", d => d["state"] === "Oregon" ? .8 : .2) },
+              exit => {
+                exit.remove()
+              }
+            )
+        })
+        d3.select("#NewPork").on("mouseover", function () {
+          console.log(chartReg.selectAll('circle'));
+          chartReg.selectAll("circle")
+            .data(wineData)
+            .join(
+              enter => {
+              },
+              update => { update.attr("opacity", d => d["state"] === "New York" ? .8 : .2) },
+              exit => {
+                exit.remove()
+              }
+            )
+        })
+        d3.select("#George").on("mouseover", function () {
+          console.log(chartReg.selectAll('circle'));
+          chartReg.selectAll("circle")
+            .data(wineData)
+            .join(
+              enter => {
+              },
+              update => { update.attr("opacity", d => d["state"] === "Washington" ? .8 : .2) },
+              exit => {
+                exit.remove()
+              }
+            )
+        })
+        d3.select("#Clerr").on("mouseover", function () {
+          console.log(chartReg.selectAll('circle'));
+          chartReg.selectAll("circle")
+            .data(wineData)
+            .join(
+              enter => {
+              },
+              update => { update.attr("opacity", .8) },
+              exit => {
+                exit.remove()
+              }
+            )
+        })
+      })
   </script>
+  </p>
 </body>
 
 </html>
