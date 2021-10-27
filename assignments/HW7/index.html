@@ -1,0 +1,29 @@
+<html>
+    <head>
+        <script src="https://d3js.org/d3.v7.min.js"></script>
+        <script src="https://d3js.org/topojson.v3.min.js"></script>
+    </head>
+    <body>
+        <p> Problem 1: <br>
+
+            <svg id="choropleth" height="770" width="990" style="margin:20px">
+            </svg>
+
+            <script>
+
+                const requestData = async function() {
+
+                    const ny = await d3.json("ny_income.topo.json")
+                    console.log(ny);
+                }
+
+                requestData();
+
+
+
+
+            </script>
+
+        </p>
+    </body>
+</html>
