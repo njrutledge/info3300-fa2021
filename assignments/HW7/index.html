@@ -11,10 +11,20 @@
 
             <script>
 
+                const map = d3.select("#choropleth")
+                const mapWidth = map.attr("width")
+                const mapHeight = map.attr("height")
                 const requestData = async function() {
 
-                    const ny = await d3.json("ny_income.topo.json")
-                    console.log(ny);
+                    const nyincome = await d3.json("ny_income.topo.json")
+                    console.log(nyincome);
+
+                    var zips = topojson.feature(nyincome, nyincome.objects.zip_codes);
+                    var zipsMesh = topojson.mesh(nyincome, nyincome.objects.zip_codes);
+                    var stateMesh = topojson.mesh(nyincome, nyincome.objects.state);
+                    var projection = d3.geoMercator().fitSize([mapWidth, mapHeight], state);
+                    var path = d3.geoPath().projection(projection);
+                
                 }
 
                 requestData();
