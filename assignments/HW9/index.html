@@ -1,0 +1,28 @@
+<html>
+    <head>
+        <script src="https://d3js.org/d3.v7.min.js"></script>
+
+    </head>
+    <body>
+        <p>
+            I chose the Bob Ross dataset because Bob Ross is amazing. I want to see which frames are used the most, and what elements are present the most per frame.
+        </p>
+        <svg width="800" height="800"></svg>
+        <script>
+            requestData = async function(){
+                const ross = await d3.csv("bob-ross.csv")
+                console.log(ross);
+                ross.forEach(r => {
+                    for (const [key, value] of Object.entries(r)) {
+                        if (value === "0"){
+                            delete r[key]
+                        }
+                    }
+                    //console.log(r)
+                })
+                console.log(ross);
+            }
+            requestData();
+        </script>
+    </body>
+</html>

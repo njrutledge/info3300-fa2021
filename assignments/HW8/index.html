@@ -1,0 +1,36 @@
+<html>
+    <head>
+        <script src="https://d3js.org/d3.v7.min.js"></script>
+
+    </head>
+    <body>
+        <p id="p1"> Problem 1: <br>
+            <div id="barcodes"></div>
+            <script>
+                requestData = async function() {
+                    movies = await d3.json("movie_barcodes.json")
+                    console.log(movies);
+
+                    movies.forEach( m => {
+                        const masterDiv = d3.select("#barcodes")
+                        const div = masterDiv.append("div")
+                        div.append("h5").text(m.title)
+                        const canvas = div.append("canvas")
+                            .attr("width", "800")
+                            .attr("height", "100")
+                        const context = canvas.node().getContext('2d');
+                        context.lineWidth = 1;
+                        m.bars.forEach( b => {
+                            context.strokeStyle = b.color;
+                            context.beginPath();
+                            context.moveTo(b.x+.5, 0);
+                            context.lineTo(b.x+.5, 100);
+                            context.stroke();
+                        })
+                    })
+                }
+                requestData();
+            </script>
+        </p>
+    </body>
+</html>
