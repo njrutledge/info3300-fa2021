@@ -1,28 +1,82 @@
 <html>
-    <head>
-        <script src="https://d3js.org/d3.v7.min.js"></script>
 
-    </head>
-    <body>
-        <p>
-            I chose the Bob Ross dataset because Bob Ross is amazing. I want to see which frames are used the most, and what elements are present the most per frame.
-        </p>
-        <svg width="800" height="800"></svg>
-        <script>
-            requestData = async function(){
-                const ross = await d3.csv("bob-ross.csv")
-                console.log(ross);
-                ross.forEach(r => {
-                    for (const [key, value] of Object.entries(r)) {
-                        if (value === "0"){
-                            delete r[key]
-                        }
+<head>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+
+</head>
+
+<body>
+    <p>
+        I chose the Bob Ross dataset because Bob Ross is amazing. I want to see which elements are used the most, and
+        what elements are present the most per frame. As a quick note (not needed in a separate p tag) I wanted to do
+        this by frame usage, but only 53 paintings have frames, and this quickly failed to be useful.
+    </p>
+    <svg id="svg" width="400" height="800"></svg>
+    <script>
+        requestData = async function () {
+            let ross = await d3.csv("bob-ross.csv")
+            console.log(ross);
+            const regex = new RegExp('FRAME')
+            const tree_keys = ["CONIFER", "DECIDUOUS", "PALM_TREES"]
+            let elements = {}
+            //ross = ross.filter(r => r["FRAMED"] === "1");
+            ross.forEach(r => {
+                delete r["EPISODE"];
+                delete r["TITLE"];
+                for (const [key, value] of Object.entries(r)) {
+                    if (value === "0") {
+                        delete r[key];
+                    } else {
+                        elements[key] = (elements[key] ?? 0) + 1
                     }
-                    //console.log(r)
-                })
-                console.log(ross);
-            }
-            requestData();
-        </script>
-    </body>
+                }
+                //console.log(r)
+            })
+            console.log(ross);
+            console.log(elements);
+
+            const svg = d3.select('#svg');
+            const width = svg.attr("width");
+            const height = svg.attr("height");
+            const margin = { top: 50, right: 50, bottom: 50, left: 50 };
+            const chartWidth = width - margin.left - margin.right;
+            const chartHeight = height - margin.top - margin.bottom;
+            const annotations = svg.append("g").attr("id", "annotations");
+            const chartArea = svg.append("g").attr("id", "points")
+                .attr("transform", `translate(${margin.left},${margin.top})`);
+
+
+            let element_array = Object.entries(elements).sort(function (a, b) {
+                return b[1] - a[1];
+            }).slice(0, 25);
+            console.log(element_array);
+            const elementExtent = d3.extent(element_array, e => e[1])
+            console.log(elementExtent);
+            const xScale = d3.scaleLinear().domain(elementExtent).range([25, 200])
+            const yScale = d3.scaleLinear().domain([0, 25]).range([0, chartHeight])
+
+            element_array.forEach((e, i) => {
+                console.log(e, i)
+                chartArea.append("rect")
+                    .attr("x", "100")
+                    .attr("y", yScale(i))
+                    .attr("width", xScale(e[1]))
+                    .attr("height", "15")
+                    .style("fill", "blue");
+
+                annotations.append("text")
+                    .attr("x", "50")
+                    .attr("y", yScale(i) + 60)
+                    .attr("text-align", "center")
+                    .attr("font-size", "small")
+                    .text(e[0]);
+
+            });
+
+
+        }
+        requestData();
+    </script>
+</body>
+
 </html>
