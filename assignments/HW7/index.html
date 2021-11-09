@@ -1,39 +1,91 @@
 <html>
-    <head>
-        <script src="https://d3js.org/d3.v7.min.js"></script>
-        <script src="https://d3js.org/topojson.v3.min.js"></script>
-    </head>
-    <body>
-        <p> Problem 1: <br>
 
-            <svg id="choropleth" height="770" width="990" style="margin:20px">
-            </svg>
+<head>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script src="https://d3js.org/topojson.v3.min.js"></script>
+</head>
 
-            <script>
+<body>
+    <p> Problem 1: <br>
+        <svg id="choropleth" height="770" width="990" style="margin:20px">
+        </svg><br>
+    <ul id="htelporohc"> </ul>
+    <script>
 
-                const map = d3.select("#choropleth")
-                const mapWidth = map.attr("width")
-                const mapHeight = map.attr("height")
-                const requestData = async function() {
+        const map = d3.select("#choropleth")
+        const mapWidth = map.attr("width")
+        const mapHeight = map.attr("height")
+        const requestData = async function () {
 
-                    const nyincome = await d3.json("ny_income.topo.json")
-                    console.log(nyincome);
+            const nyincome = await d3.json("ny_income.topo.json")
+            console.log(nyincome);
 
-                    var zips = topojson.feature(nyincome, nyincome.objects.zip_codes);
-                    var zipsMesh = topojson.mesh(nyincome, nyincome.objects.zip_codes);
-                    var stateMesh = topojson.mesh(nyincome, nyincome.objects.state);
-                    var projection = d3.geoMercator().fitSize([mapWidth, mapHeight], state);
-                    var path = d3.geoPath().projection(projection);
-                
-                }
+            var zips = topojson.feature(nyincome, nyincome.objects.zip_codes);
+            var zipsMesh = topojson.mesh(nyincome, nyincome.objects.zip_codes);
+            var stateMesh = topojson.mesh(nyincome, nyincome.objects.state);
+            var projection = d3.geoMercator().fitSize([mapWidth, mapHeight], zips);
+            var path = d3.geoPath().projection(projection);
 
-                requestData();
+            let colors = [];
+            for (let i = 0; i <= 4; i++) {
+                colors[i] = d3.hsl(200 + 30 * i, .7, .3 + .1 * i).formatHex();
+            }
+
+            let medianIncome = d3.map(zips.features, function (geo) {
+                return geo.properties.median_income
+            })
+
+            const domain = d3.extent(medianIncome)
+            let colorScale = d3.scaleQuantile().domain(domain).range(colors)
+
+            map.selectAll("zip.path").data(zips.features)
+                .join("path")
+                .attr("class", "zip")
+                .attr("d", path)
+                .style("fill", d => colorScale(d.properties.median_income))
+
+            map.append("path").datum(zipsMesh)
+                .attr("class", "outline")
+                .attr("d", path)
+                .style("stroke", "white")
+                .style("stroke-width", "1")
+                .style("fill", "none")
+
+            map.append("path").datum(stateMesh)
+                .attr("class", "state")
+                .attr("d", path)
+                .style("stroke", "darkgrey")
+                .style("stroke-width", "3")
+                .style("fill", "none")
+
+            point = projection([-76.4850, 42.4476])
+            map.append("circle")
+                .attr("cx", point[0])
+                .attr("cy", point[1])
+                .attr("r", "5")
+                .style("fill", "black")
+
+            console.log(colorScale.quantiles())
+
+            let ui = d3.select("#htelporohc")
+
+            colorScale.quantiles().forEach(q => {
+                ui.append("li")
+                    .text(q)
+                console.log(q)
+            })
+
+        }
+
+
+        requestData();
 
 
 
 
-            </script>
+    </script>
 
-        </p>
-    </body>
+    </p>
+</body>
+
 </html>

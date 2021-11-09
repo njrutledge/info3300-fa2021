@@ -1,0 +1,111 @@
+<html>
+
+<head>
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+  <style>
+    .gridlines line {
+      stroke: #bbb;
+    }
+
+    .gridlines .domain {
+      stroke: none;
+    }
+  </style>
+</head>
+
+<body>
+  <p> Problem 1:<br>
+
+  </p>
+  <svg id="p1" width="800" height="400">
+
+  </svg>
+  <script>
+    const requestData = async function () {
+      const data = await d3.json("mariokart_records.json");
+
+      const svg = d3.select('#p1');
+      const width = svg.attr("width");
+      const height = svg.attr("height");
+      const margin = { top: 10, right: 10, bottom: 50, left: 50 };
+      const chartWidth = width - margin.left - margin.right;
+      const chartHeight = height - margin.top - margin.bottom;
+      const annotations = svg.append("g").attr("id", "annotations");
+      const chartArea = svg.append("g").attr("id", "points")
+        .attr("transform", `translate(${margin.left},${margin.top})`);
+      const parseTime = d3.timeParse("%Y-%m-%d")
+      data["earliest_date"] = parseTime(data["earliest_date"])
+      data["latest_date"] = parseTime(data["latest_date"])
+      data["tracks"] = []
+      data["timeseries"].forEach(d => {
+        data["tracks"].push(d["track"])
+        d["values"].forEach(v => {
+          //v["date"] = parseTime(v["date"])
+        })
+      })
+      console.log(data)
+      const dateExtent = [data["earliest_date"], data["latest_date"]]
+      console.log(dateExtent)
+      const timeScale = d3.scaleTime().domain(dateExtent).range([0, chartWidth])
+      const valueScale = d3.scaleLinear().domain([data['min_value'], data['max_value']]).range([chartHeight, 0])
+      const trackColorScale = d3.scaleOrdinal().domain(data["tracks"]).range(d3.schemeCategory10)
+
+      console.log(timeScale)
+      console.log(timeScale(dateExtent[0]))
+      console.log(timeScale(dateExtent[1]))
+
+      const timeAxis = d3.axisBottom(timeScale)
+      const timeGridlines = d3.axisBottom(timeScale)
+        .tickSize(-chartHeight - 10)
+        .tickFormat("")
+      annotations.append("g")
+        .attr("class", "x axis")
+        .attr("transform", `translate(${margin.left},${chartHeight + margin.top + 10})`)
+        .call(timeAxis);
+      annotations.append("g")
+        .attr("class", "x gridlines")
+        .attr("transform", `translate(${margin.left},${chartHeight + margin.top + 10})`)
+        .call(timeGridlines);
+
+
+
+      const valueAxis = d3.axisLeft(valueScale)
+      const valueGridlines = d3.axisLeft(valueScale)
+        .tickSize(-chartWidth - 10)
+        .tickFormat("")
+      annotations.append("g")
+        .attr("class", "y axis")
+        .attr("transform", `translate(${margin.left - 10},${margin.top})`)
+        .call(valueAxis);
+      annotations.append("g")
+        .attr("class", "y gridlines")
+        .attr("transform", `translate(${margin.left - 10},${margin.top})`)
+        .call(valueGridlines);
+
+
+      line = d3.line()
+        .x(v => timeScale(parseTime(v["date"])))
+        .y(v => valueScale(v["record_time"]))
+
+      things = chartArea.selectAll('g.thing').data(data.timeseries)
+        .join('g')
+        .attr("class", 'thing')
+        .style("stroke", d => trackColorScale(d.track))
+      things.append("path")
+        .attr("d", d => line(d.values))
+        .style("stroke-width", "2")
+        .style("fill", "none")
+
+      things.selectAll('circle')
+        .data(d => d.values)
+        .join('circle')
+        .attr('cx', v => timeScale(parseTime(v["date"])))
+        .attr('cy', v => valueScale(v["record_time"]))
+        .attr('r', '2')
+        .style('fill', v => trackColorScale(v.track))
+    }
+    requestData();
+  </script>
+</body>
+
+</html>
