@@ -17,18 +17,36 @@
             let ross = await d3.csv("bob-ross.csv")
             console.log(ross);
             const regex = new RegExp('FRAME')
-            const tree_keys = ["CONIFER", "DECIDUOUS", "PALM_TREES"]
+            const tree_keys = ["Conifer", "Deciduous", "Palm trees"]
+            const water_keys = ["Lake", "Ocean", "River", "Waterfall", "Waves"]
+            const cloud_keys = ["Cirrus", "Cumulus"]
+            const frame_keys = ["Apple frame", "Circle frame", "Double oval frame", "Florida frame",
+             "Half circle frame", "Half oval frame", "Oval frame", "Rectangle 3d frame",
+              "Rectangular frame", "Seashell frame", "Split frame", "Tomb frame", "Window frame",
+               "Wood framed"];
+            const structure_keys = ["Bridge", "Building", "Cabin", "Mill", "Windmill" ]
+            const all_keys = tree_keys.concat(water_keys).concat(cloud_keys).concat(frame_keys).concat(structure_keys)
+            const key_types = ["Tree", "Trees", "Water", "Clouds", "Framed", "Structure"]
             let elements = {}
             //ross = ross.filter(r => r["FRAMED"] === "1");
             ross.forEach(r => {
                 delete r["EPISODE"];
                 delete r["TITLE"];
-                for (const [key, value] of Object.entries(r)) {
+                delete r["STEVE_ROSS"]
+                let water = false;
+                for (let [key, value] of Object.entries(r)) {
                     if (value === "0") {
                         delete r[key];
                     } else {
+                        key = (key.slice(0,1) + key.toLowerCase().slice(1)).replace(/_/g, ' ');
                         elements[key] = (elements[key] ?? 0) + 1
+                        if (water_keys.indexOf(key) > -1){
+                            water = true;
+                        }
                     }
+                }
+                if (water){
+                    elements["Water"] = (elements["Water"] ?? 0) + 1
                 }
                 //console.log(r)
             })
@@ -46,33 +64,107 @@
                 .attr("transform", `translate(${margin.left},${margin.top})`);
 
 
-            let element_array = Object.entries(elements).sort(function (a, b) {
-                return b[1] - a[1];
-            }).slice(0, 25);
+            let element_array = Object.entries(elements)
+                .sort(function (a, b) {return b[1] - a[1]; })
+            let top_25 = element_array.filter(e => all_keys.indexOf(e[0]) === -1).slice(0, 25);
+                
             console.log(element_array);
-            const elementExtent = d3.extent(element_array, e => e[1])
+            const elementExtent = d3.extent(top_25.slice(0, 25), e => e[1])
             console.log(elementExtent);
             const xScale = d3.scaleLinear().domain(elementExtent).range([25, 200])
             const yScale = d3.scaleLinear().domain([0, 25]).range([0, chartHeight])
 
-            element_array.forEach((e, i) => {
-                console.log(e, i)
-                chartArea.append("rect")
-                    .attr("x", "100")
-                    .attr("y", yScale(i))
-                    .attr("width", xScale(e[1]))
+            chartArea.selectAll("rect.main").data(top_25)
+                .join("rect")
+                .attr("class", e => "main " + e[0])
+                .attr("x", "100")
+                .attr("y",(_, i) => yScale(i))
+                .attr("width", e => xScale(e[1]))
+                .attr("height", "15")
+                .attr("label", e => e[0])
+                .attr("saved_width", e => xScale(e[1]))
+                .style("fill", "blue");
+
+            let texts = annotations.selectAll("text.label").data(top_25)
+                .join("text")
+                .attr("class", "label")
+                .attr("x", "130")
+                .attr("y",(_, i)=> yScale(i) + 60)
+                .style("text-anchor", "end")
+                .style("dominant-baseline", "middle")
+                .style("font-size", "small")
+                .text(e => e[0]);
+                    
+            annotations.selectAll("text.percent").data(top_25)
+                .join("text")
+                .attr("class", "percent")
+                .attr("x",e => 160 + xScale(e[1]))
+                .attr("y", (_, i) => yScale(i) + 60)
+                .style("text-anchor", "start")
+                .style("dominant-baseline", "middle")
+                .style("font-size", "small")
+                .text(e => (e[1]/ross.length*100).toFixed(2) + "%");
+
+            function makeRects(keys, me){
+                let extraExtent = [0,0]
+                keys.forEach(e => {
+                    console.log(e, elements[e])
+                    extraExtent[1] += elements[e];
+                })
+                console.log(extraExtent)
+                const scaleExtra = d3.scaleLinear().domain(extraExtent).range([0, 250])
+                const colorScale = d3.scaleOrdinal(d3.schemeCategory10);
+                let prev = 0;
+                keys.forEach((e,i) => {
+                    chartArea.append("rect")
+                    .attr("class", "extra")
+                    .attr("x",100 + prev)
+                    .attr("y", me.attr("y"))
+                    .attr("width", scaleExtra(prev + elements[e]) - scaleExtra(prev))
                     .attr("height", "15")
-                    .style("fill", "blue");
+                    .attr("label", "extra")
+                    .style("fill", colorScale(i))
+                    prev = prev + scaleExtra(elements[e])
+                })
+            }
 
-                annotations.append("text")
-                    .attr("x", "50")
-                    .attr("y", yScale(i) + 60)
-                    .attr("text-align", "center")
-                    .attr("font-size", "small")
-                    .text(e[0]);
+            texts.on("mouseover", function() {
+                let label = this.textContent
+                let str = "rect." + label
+                console.log(str);
+                let mainRect = chartArea.select("rect." + label)
+                console.log(label)
+                console.log(mainRect)
+                let keys = undefined
+                if(label === "Trees" || label === "Tree"){
+                        keys = tree_keys;
+                    }else if(label === "Water"){
+                        keys = water_keys;
+                    }else if(label === "Clouds"){
+                        keys =cloud_keys
+                    }else if(label === "Framed"){
+                       keys = frame_keys
+                    }else if(label === "Structure"){
+                        keys = structure_keys
+                    }
+                if(key_types.indexOf(mainRect.attr("label")) !== -1){
+                    mainRect.transition().duration(200)
+                    .attr("width", "300")
+                    .on("end", () => makeRects(keys, mainRect))
+                    console.log(keys)
+                    
+                }
 
+                
             });
 
+            texts.on("mouseout", function() {
+                chartArea.selectAll("rect.extra").remove()
+                let label = this.textContent
+                let rect = chartArea.select("rect." + label)
+                    rect.transition().duration(200)
+                        .attr("width", rect.attr("saved_width"))
+            });
 
         }
         requestData();
