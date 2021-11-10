@@ -8,10 +8,11 @@
 <body>
     <p>
         I chose the Bob Ross dataset because Bob Ross is amazing. I want to see which elements are used the most, and
-        what elements are present the most per frame. As a quick note (not needed in a separate p tag) I wanted to do
-        this by frame usage, but only 53 paintings have frames, and this quickly failed to be useful.
+        display them by percentage found in paintings (ie: what percent of paintings have a given element?)
+        <br>Drilldown: mouseover bolded text to get more information about a category (only bolded texts are
+        categories).
     </p>
-    <svg id="svg" width="400" height="800"></svg>
+    <svg id="svg" width="700" height="800"></svg>
     <script>
         requestData = async function () {
             let ross = await d3.csv("bob-ross.csv")
@@ -21,10 +22,10 @@
             const water_keys = ["Lake", "Ocean", "River", "Waterfall", "Waves"]
             const cloud_keys = ["Cirrus", "Cumulus"]
             const frame_keys = ["Apple frame", "Circle frame", "Double oval frame", "Florida frame",
-             "Half circle frame", "Half oval frame", "Oval frame", "Rectangle 3d frame",
-              "Rectangular frame", "Seashell frame", "Split frame", "Tomb frame", "Window frame",
-               "Wood framed"];
-            const structure_keys = ["Bridge", "Building", "Cabin", "Mill", "Windmill" ]
+                "Half circle frame", "Half oval frame", "Oval frame", "Rectangle 3d frame",
+                "Rectangular frame", "Seashell frame", "Split frame", "Tomb frame", "Window frame",
+                "Wood framed"];
+            const structure_keys = ["Bridge", "Building", "Cabin", "Mill", "Windmill"]
             const all_keys = tree_keys.concat(water_keys).concat(cloud_keys).concat(frame_keys).concat(structure_keys)
             const key_types = ["Tree", "Trees", "Water", "Clouds", "Framed", "Structure"]
             let elements = {}
@@ -38,14 +39,14 @@
                     if (value === "0") {
                         delete r[key];
                     } else {
-                        key = (key.slice(0,1) + key.toLowerCase().slice(1)).replace(/_/g, ' ');
+                        key = (key.slice(0, 1) + key.toLowerCase().slice(1)).replace(/_/g, ' ');
                         elements[key] = (elements[key] ?? 0) + 1
-                        if (water_keys.indexOf(key) > -1){
+                        if (water_keys.indexOf(key) > -1) {
                             water = true;
                         }
                     }
                 }
-                if (water){
+                if (water) {
                     elements["Water"] = (elements["Water"] ?? 0) + 1
                 }
                 //console.log(r)
@@ -59,116 +60,149 @@
             const margin = { top: 50, right: 50, bottom: 50, left: 50 };
             const chartWidth = width - margin.left - margin.right;
             const chartHeight = height - margin.top - margin.bottom;
-            const annotations = svg.append("g").attr("id", "annotations");
-            const chartArea = svg.append("g").attr("id", "points")
+            const annoBot = svg.append("g").attr("id", "annoBot")
+                .attr("transform", `translate(${margin.left},${margin.top})`);
+            const chartArea = svg.append("g").attr("id", "rects")
+                .attr("transform", `translate(${margin.left},${margin.top})`);
+            const annoTop = svg.append("g").attr("id", "annoTop")
                 .attr("transform", `translate(${margin.left},${margin.top})`);
 
 
+
             let element_array = Object.entries(elements)
-                .sort(function (a, b) {return b[1] - a[1]; })
+                .sort(function (a, b) { return b[1] - a[1]; })
             let top_25 = element_array.filter(e => all_keys.indexOf(e[0]) === -1).slice(0, 25);
-                
+
             console.log(element_array);
             const elementExtent = d3.extent(top_25.slice(0, 25), e => e[1])
             console.log(elementExtent);
-            const xScale = d3.scaleLinear().domain(elementExtent).range([25, 200])
+            const xScale = d3.scaleLinear().domain(elementExtent).range([25, 400])
             const yScale = d3.scaleLinear().domain([0, 25]).range([0, chartHeight])
 
             chartArea.selectAll("rect.main").data(top_25)
                 .join("rect")
                 .attr("class", e => "main " + e[0])
                 .attr("x", "100")
-                .attr("y",(_, i) => yScale(i))
+                .attr("y", (_, i) => yScale(i))
                 .attr("width", e => xScale(e[1]))
-                .attr("height", "15")
+                .attr("height", "20")
                 .attr("label", e => e[0])
                 .attr("saved_width", e => xScale(e[1]))
                 .style("fill", "blue");
 
-            let texts = annotations.selectAll("text.label").data(top_25)
+            let texts = annoBot.selectAll("text.label").data(top_25)
                 .join("text")
                 .attr("class", "label")
-                .attr("x", "130")
-                .attr("y",(_, i)=> yScale(i) + 60)
+                .attr("x", "80")
+                .attr("y", (_, i) => yScale(i) + 10)
                 .style("text-anchor", "end")
                 .style("dominant-baseline", "middle")
-                .style("font-size", "small")
+                .style("font-size", e => key_types.indexOf(e[0]) !== -1 ? "medium" : "small")
+                .style("font-weight", e => key_types.indexOf(e[0]) !== -1 ? "bold" : "none")
                 .text(e => e[0]);
-                    
-            annotations.selectAll("text.percent").data(top_25)
+
+            annoBot.selectAll("text.percent").data(top_25)
                 .join("text")
                 .attr("class", "percent")
-                .attr("x",e => 160 + xScale(e[1]))
-                .attr("y", (_, i) => yScale(i) + 60)
+                .attr("x", e => 110 + xScale(e[1]))
+                .attr("y", (_, i) => 10 + yScale(i))
                 .style("text-anchor", "start")
                 .style("dominant-baseline", "middle")
                 .style("font-size", "small")
-                .text(e => (e[1]/ross.length*100).toFixed(2) + "%");
+                .text(e => (e[1] / ross.length * 100).toFixed(2) + "%");
 
-            function makeRects(keys, me){
-                let extraExtent = [0,0]
+
+
+            function makeRects(keys, me) {
+                let extraExtent = [0, 0];
                 keys.forEach(e => {
-                    console.log(e, elements[e])
+                    console.log(e, elements[e]);
                     extraExtent[1] += elements[e];
                 })
-                console.log(extraExtent)
-                const scaleExtra = d3.scaleLinear().domain(extraExtent).range([0, 250])
+                console.log(extraExtent);
+                const scaleExtra = d3.scaleLinear().domain(extraExtent).range([0, 450]);
                 const colorScale = d3.scaleOrdinal(d3.schemeCategory10);
                 let prev = 0;
-                keys.forEach((e,i) => {
-                    chartArea.append("rect")
+                chartArea.append("rect")
                     .attr("class", "extra")
-                    .attr("x",100 + prev)
-                    .attr("y", me.attr("y"))
-                    .attr("width", scaleExtra(prev + elements[e]) - scaleExtra(prev))
-                    .attr("height", "15")
-                    .attr("label", "extra")
-                    .style("fill", colorScale(i))
-                    prev = prev + scaleExtra(elements[e])
+                    .attr("x", -50)
+                    .attr("y", Number(me.attr("y")) + 20)
+                    .attr("width", "700")
+                    .attr("height", "120")
+                    .style("fill", "white");
+                keys.forEach((e, i) => {
+                    chartArea.append("rect")
+                        .attr("class", "extra")
+                        .attr("x", 100 + prev)
+                        .attr("y", me.attr("y"))
+                        .attr("width", scaleExtra(prev + elements[e]) - scaleExtra(prev))
+                        .attr("height", "20")
+                        .attr("label", "extra")
+                        .style("fill", colorScale(i));
+
+                    console.log(e);
+                    annoTop.append("text")
+                        .attr("class", "extra")
+                        //.attr("x", 100 + prev + (scaleExtra(prev + elements[e]) - scaleExtra(prev)) / 2)
+                        //.attr("y", Number(me.attr("y")) + 30 + (parity % 3 === 0 ? 0 : parity % 3 === 1 ? 20 : 40))
+                        .style("text-anchor", "start")
+                        .style("dominant-baseline", "middle")
+                        .style("font-size", "10")
+                        .text(e + " " + (elements[e] / ross.length * 100).toFixed(2) + "%")
+                        .attr("transform", `translate(${100 + prev + (scaleExtra(prev + elements[e]) - scaleExtra(prev)) / 2},${Number(me.attr("y")) + 25}) rotate(90)`);
+
+                    prev = prev + scaleExtra(elements[e]);
+
                 })
             }
 
-            texts.on("mouseover", function() {
+            texts.on("mouseover", function () {
                 let label = this.textContent
                 let str = "rect." + label
                 console.log(str);
-                let mainRect = chartArea.select("rect." + label)
+                let mainRect = chartArea.select("rect." + label.replace(/ /g, '.'))
                 console.log(label)
                 console.log(mainRect)
                 let keys = undefined
-                if(label === "Trees" || label === "Tree"){
-                        keys = tree_keys;
-                    }else if(label === "Water"){
-                        keys = water_keys;
-                    }else if(label === "Clouds"){
-                        keys =cloud_keys
-                    }else if(label === "Framed"){
-                       keys = frame_keys
-                    }else if(label === "Structure"){
-                        keys = structure_keys
-                    }
-                if(key_types.indexOf(mainRect.attr("label")) !== -1){
+                if (label === "Trees" || label === "Tree") {
+                    keys = tree_keys;
+                } else if (label === "Water") {
+                    keys = water_keys;
+                } else if (label === "Clouds") {
+                    keys = cloud_keys
+                } else if (label === "Framed") {
+                    keys = frame_keys
+                } else if (label === "Structure") {
+                    keys = structure_keys
+                }
+                if (key_types.indexOf(mainRect.attr("label")) !== -1) {
                     mainRect.transition().duration(200)
-                    .attr("width", "300")
-                    .on("end", () => makeRects(keys, mainRect))
+                        .attr("width", "450")
+                        .on("end", () => makeRects(keys, mainRect))
                     console.log(keys)
-                    
+
                 }
 
-                
+
             });
 
-            texts.on("mouseout", function() {
+            texts.on("mouseout", function () {
                 chartArea.selectAll("rect.extra").remove()
+                annoTop.selectAll("text.extra").remove()
                 let label = this.textContent
-                let rect = chartArea.select("rect." + label)
-                    rect.transition().duration(200)
-                        .attr("width", rect.attr("saved_width"))
+                let rect = chartArea.select("rect." + label.replace(/ /g, '.'))
+                rect.transition().duration(400)
+                    .attr("width", rect.attr("saved_width"))
             });
 
         }
         requestData();
     </script>
+    <p>
+        Tradeoffs: I left "Tree" and "Trees" as separate, but decided to not have different mouseover events for the
+        two. This is because finding what type of tree is present when only one tree is in the painting would take a lot
+        of work for minimal payout.
+    </p>
 </body>
 
 </html>
